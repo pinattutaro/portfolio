@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>portfolio</title>
+		<style type="text/css">
+			@font-face {
+				font-family: "shumatsu";
+				src: url('dl_font/少女終末旅行.otf');
+			}
+
+			@font-face {
+				font-family: "dot";
+				src: url('dl_font/ryakjisknameMdot10.ttf');
+			}
+
+			body {
+				width: 100vw;
+				overflow-x: hidden;
+				margin: 0px;
+				font-family: "dot";
+
+				& > div {
+					width: 100%;
+				}
+
+				&::-webkit-scrollbar {
+					display: none;
+				}
+			}
+
+			#content {
+				position: absolute;
+				left: 0px;
+				top: 0px;			
+			}
+
+			#header {
+				position: sticky;
+				top: 0px;
+				left: 0px;
+				background: black;		
+				height: 100px;	
+				z-index: 999;
+
+				#title {
+					padding-left: 20px;
+					font-size: 60px;
+					line-height: 100px;
+					color: white;
+					letter-spacing: 2px;
+					/*text-decoration: underline;
+					text-decoration-color: cyan;
+					text-decoration-style: 2px;*/
+
+					& > span {
+						color: cyan;
+					}
+				}
+
+				#links {
+					position: absolute;
+					right: 10px;
+					display: inline-block;
+					height: 100%;
+
+					& > a {
+						display: inline-block;
+						height: 100%;
+						line-height: 100px;
+						margin: 0px 10px;
+						text-decoration: none;
+						color: white;
+					}
+				}
+			}
+
+			#main {
+				height: auto;
+				padding: 0px 10vw;
+				background-color: #e0ffff;
+				--indent: 15px;
+
+				.subTitle {
+					font-size: 40px;
+					line-height: 50px;
+					margin-left: calc(-1* var(--indent));
+				}
+
+				& > div {
+					border-bottom: solid 1px #ccc;
+					padding: 10px 0px;
+					padding-left: var(--indent);
+					font-size: 20px;
+					scroll-margin-top: 100px !important;
+				}
+
+				.list {
+					display: grid;
+					grid-template-columns: auto 30px auto;
+					grid-row-gap: 10px;
+					line-height: 40px;
+
+					/*&>p:nth-child(2n-1):after {
+						content: ":";
+					}*/
+
+					&>p {
+						margin: 0px;
+
+						& a {
+							text-decoration: none;
+							color: black;
+						}
+					}
+				}
+
+				#skills > #levels {
+					& > .level {
+						margin: 10px 0px;
+
+						& > span {
+							font-size: 30px;
+							line-height: 40px;
+						}
+					}
+				}
+
+				.icons  {
+					width: 100%;
+					display: grid;
+					grid-template-columns: repeat(4, 1fr);
+					grid-gap: 30px;
+					/*grid-row-gap: 30px;*/
+
+					& > div,a {
+						border: solid 1px #ccc;
+						box-sizing: border-box;
+						aspect-ratio: 1;
+						display: grid;
+						grid-template-rows: 70% 30%;
+						transition: grid-template-rows 0.3s ease;
+						overflow-y: hidden;
+						background-repeat: no-repeat;
+						background-size: 85%;
+						background-position: 50%;
+						text-decoration: none;
+
+						&:hover > p {
+							bottom: 0px;
+						}
+
+						& > span {
+							grid-row: 1/2;
+							width: 100%;
+							padding: 0px;
+							margin: 0px;
+							display: grid;
+
+							& > span {
+								transition: top 0.3s ease !important;
+								width: 100%;
+								height: 100%;
+								margin: 0px;
+								padding: 0px;
+								text-align: center;
+								word-wrap: break-all;
+								backdrop-filter: brightness(0.5);
+								position: relative;
+								top: -100%;
+								color: rgba(255,255,255,0.7);
+								overflow: hidden;
+								
+								display: grid;
+								place-items: center;	
+								height: auto;									
+							}			
+
+							&:hover > span {
+								top: 0%;
+							}		
+						}
+
+						& > p {
+							transition: bottom 0.3s ease !important;
+							width: 100%;
+							grid-row: 2/3;
+							margin: 0px;
+							backdrop-filter: brightness(0.5);
+							position: relative;
+							bottom: calc(-1 * 100%);
+							color: rgba(255,255,255,0.7);
+							overflow: hidden;
+							
+							display: grid;
+							place-items: center;	
+							height: auto;						
+						}
+					}
+				}
+
+				@media (max-width: 700px) {
+					.icons {
+						grid-template-columns: repeat(3, 1fr);
+						grid-gap: 10px;
+					}
+				}
+
+				@media (max-width: 500px) {
+					.icons {
+						grid-template-columns: repeat(2, 1fr);
+						grid-gap: 0px;
+					}
+				}
+
+				.pList {
+					min-height: 100px;
+					display: grid;
+					grid-template-columns: 1fr 4fr;
+
+					& > span {
+						display: contents;
+
+						& > .thumb {
+							aspect-ratio: 1;
+							border: solid 1px #ccc;
+							box-sizing: border-box;
+							background-size: 100%;
+							background-repeat: no-repeat;
+							background-position: 50%;
+						}
+
+						& > .description {
+							aspect-ratio: 4;
+							border: solid 1px #ccc;
+							box-sizing: border-box;
+							padding: 5px 20px;
+
+							& > .subTitle {
+								/*margin: 0px;*/
+								font-size: 30px;
+							}
+
+							& > .tags {
+								/*font-size: 15px;*/
+								line-height: 30px;
+								color: #0cc;
+								position: relative;
+								bottom: 0px;
+							}
+
+							& > a {
+								text-decoration: none;
+								color: inherit;
+							}
+						}
+
+						&:nth-child(even) > * {
+							/*backdrop-filter: brightness(0.8);*/
+							backdrop-filter: hue-rotate(180deg);
+							color: #222;
+						}						
+					}
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div id="contnet">
+			<div id="header">
+				<!--<span id="title"><span>P</span>ORT<span>F</span>OLIO</span>-->
+				<!--<span id="title"><span>P</span>inattu</span>-->
+				<span id="title">落<span>科</span>生</span>
+
+				<div id="links">
+					<a href="">top</a>
+					<a href="#introduction">about me</a>
+					<a href="#skills">skills</a>					
+					<a href="#products">products</a>
+				</div>
+			</div>
+
+			<div id="main">
+				<div id="introduction">
+					<span class="subTitle">Introduction</span>
+					<div class="list">
+						<p>name</p><p>:</p><p style="letter-spacing: 2px;">落科生</p>
+						<p>age</p><p>:</p><p>17</p>
+						<p>mail</p><p>:</p><p>rc23135r@st.omu.ac.jp</p>
+						<p>github</p><p>:</p><p><a href="https://github.com/pinattutaro">https://github.com/pinattutaro</a></p>
+						<p>affiliation</p><p>:</p><p style="letter-spacing: 2px;">
+							<a href="https://www.ct.omu.ac.jp/">大阪公立大学工業高等専門学校</a> > <br>
+							<a href="https://www.ct.omu.ac.jp/courses/">総合工学システム学科</a> > <br>
+							<a href="https://www.ct.omu.ac.jp/courses/intelligent-informatics/">知能情報コース</a> > <br>
+							二年次</p>
+					</div>
+				</div>
+				<div id="skills">
+					<span class="subTitle">Skills</span>
+					<!--<div class="icons">
+						<div style="background-image: url('img/html-1.svg');"><p>HTML5</p></div>
+						<div style="background-image: url('img/css.svg');"><p>CSS3</p></div>
+						<div style="background-image: url('img/js.svg');"><p>JavaScript</p></div>
+						<a href="https://nodejs.org/en" style="background-image: url('img/node.svg');"><p>node.js</p></a>
+						<a href="https://www.php.net/" style="background-image: url('img/php.svg');"><p>php</p></a>
+						<a href="https://www.oracle.com/java/" style="background-image: url('img/java.svg'); background-size: 65%;"><p>java</p></a>
+						<a href="https://www.haskell.org/" style="background-image: url('img/haskell.svg');"><p>haskell</p></a>
+						<a href="https://www.mysql.com/" style="background-image: url('img/mysql.svg');"><p>MySQL</p></a>
+						<a href="https://www.python.org/" style="background-image: url('img/python.svg');"><p>python</p></a>
+					</div>-->
+					<div id="levels">
+						<div class="level">
+							<span>licence</span>
+							<div class="icons">
+								<div style="background-image: url('img/math.jpg')"><p>数学検定準一級</p></div>
+							</div>
+						</div>
+
+						<div class="level">
+							<span>main</span>
+							<div class="icons">
+								<div style="background-image: url('img/html-1.svg');"><span><span>DOM構築したいときはいつもこれ。jsとかcssも一緒に埋め込んじゃう。</span></span><p>HTML5</p></div>
+								<div style="background-image: url('img/css.svg');"><span><span>DOMの装飾もだいたいこれ。つい最近疑似クラスの素晴らしさに気付いた。アットルールは勉強中。このページにjsはないので、動作とかも総てcss。</span></span><p>CSS3</p></div>
+								<div style="background-image: url('img/js.svg');"><span><span>主言語はこれ。こにかく楽で、DOM操作は見た目に分かり易く初学者にもおすすめ。</span></span><p>JavaScript</p></div>
+								<a href="https://nodejs.org/en" style="background-image: url('img/node.svg');"><span><span>バックエンドの処理をjsで書ける実行環境。言語ではない。スクレイピングが最近の趣味。サーバも簡単に建てられる。</span></span><p>node.js</p></a>
+							</div>
+						</div>	
+
+						<div class="level">
+							<span>sub</span>
+							<div class="icons">
+								<a href="https://www.mysql.com/" style="background-image: url('img/mysql.svg');"><span><span>大量のデータを管理するときに使って、、、いたけど最近はjsonで管理することが増えたからあまり使わない。あとxamppが今はない。</span></span><p>MySQL</p></a>
+								<a href="https://www.python.org/" style="background-image: url('img/python.svg');"><span><span>嫌い。でも深層学習用のパッケージがnodeに入らなかったから仕方なく使う。</span></span><p>python</p></a>
+							</div>
+						</div>							
+
+						<div class="level">
+							<span>learning</span>
+							<div class="icons">
+								<a href="https://www.oracle.com/java/" style="background-image: url('img/java.svg'); background-size: 65%;"><span><span>やってる人が多いからやってみようかなと思った。大変面倒くさい。なぜmainを書くだけであんなに行を浪費するのか。</span></span><p>java</p></a>
+								<a href="https://www.haskell.org/" style="background-image: url('img/haskell.svg');"><span><span>どうやら私はoopよりfpの方が性に合うようで、始めた。javaより難しい。資料少なすぎ。関数の定義方法と配列が面白いと思う。</span></span><p>haskell</p></a>					
+							</div>
+						</div>	
+
+						<div class="level">
+							<span>waste</span>
+							<div class="icons">
+								<a href="https://www.php.net/" style="background-image: url('img/php.svg');"><span><span>nodeの登場によって、完全に使う機会を失った。この間パソコンのデータが飛んでphpの過去データが総て無くなったので多分二度とやらない。</span></span><p>php</p></a>
+							</div>
+						</div>					
+					</div>
+
+				</div>				
+				<div id="products">
+					<span class="subTitle">Products</span>
+					<div class="pList">
+						<span>
+							<a class="thumb" href="https://pinattutaro.github.io/forSchool/works/3d_mult.html" style="background-image: url('img/canyon.png')"></a>
+							<div class="description">
+								<div class="subTitle">Canayon Cubic Engine for prototype</div>
+								　自作3Dグラフィックエンジンのプロトタイプ。プログラミング1の課題4として提出。視点の概念はなく。遠近感も次世代タイプの作成のために削除されました。きわめて遠い地点から見ているイメージ。機能はブロックの設置と削除のみのシンプルな作品。正式版となるCanyon Cubic Engine ver1.0は指向ごと変えて制作中。
+								<div class="tags">#html5 #css3 #javascript</div>
+							</div>						
+						</span>
+
+						<span>
+							<a class="thumb" href="https://pinattutaro.github.io/Must/top/top.html" style="background-image: url('img/must.png'); background-size: 200%;"></a>
+							<div class="description">
+								<div class="subTitle">Must</div>
+								　高専祭乃至総合課題実習の作品として作成した英語学習ウェブアプリ。単語帳の方はバグってるけどウチは担当ちゃうで。でも担当のマーカーの方も日本語対応してない。creating on(予定なし)
+								<div class="tags">#html5 #css3 #javascript #node.js</div>
+							</div>						
+						</span>
+
+						<span>
+							<a class="thumb" href="https://pinattutaro.github.io/forSchool/works/chohan/cubeTest_detail.html" style="background-image: url('img/chohan.png'); background-size: 200%;"></a>
+							<div class="description">
+								<div class="subTitle">丁半~digital remastered~</div>
+								　一年生の時の高専祭でパパっと作った丁半。不正もできるよ。
+								<div class="tags">#html5 #css3 #javascript</div>
+							</div>
+						</span>
+
+						<span>
+							<a href="https://pinattutaro.github.io/forSchool/works/tetris.html" style="background-image: url('img/tetris.png');" class="thumb"></a>
+							<div class="description">
+								<div class="subTitle">Tetris</div>
+								　いつ作ったかもわかんない。多分高専入る前に作った。作りが雑。<br>そもそも私tetrisまともにやったことない。デバッグ大変やった記憶ある。
+								<div class="tags">#html5 #css3 #javascript</div>
+							</div>
+						</span>
+
+						<span>
+							<a class="thumb" href="https://github.com/pinattutaro/forSchool/tree/main/works/observe" style="background-image: url(img/extension.svg);"></a>
+							<div class="description">
+								<div class="subTitle" style="font-size: 25px;">ブラウザ使用状況管理ツール</div>
+								　保護者が被保護者のブラウザの閲覧履歴などを監視するための拡張機能。管理画面からスクリプトを実行させることも可能。悪用厳禁！！
+								<div class="tags">#node.js</div>
+							</div>
+						</span>
+
+						<span>
+							<a class="thumb" href="https://github.com/pinattutaro/forSchool/tree/main/works/extendsForPixivBookmarks" style="background-image: url('img/extension.svg');"></a>
+							<div class="description">
+								<div class="subTitle">Extension for Searching Pixiv Bookmarks</div>
+								　<a href="https://www.pixiv.net">pixiv</a>のブックマークの検索機能ってめっちゃ不便ですよね。タグを検索できるのはいいんですが、自分でタグを設定しなければいけなかったり、複数のタグや詳細な絞り込みできなかったりと惜しい所がありますね。それを自分で補完するための拡張機能だよ。大枠はできたけどスタイル考えるのが面倒くさい。
+								<div class="tags">#javascript</div>
+							</div>
+						</span>
+
+						<span>
+							<a href="https://github.com/pinattutaro/forSchool/tree/main/works/openMask" class="thumb" style="background-image: url('img/extension.svg');"></a>
+							<div class="description">
+								<div class="subTitle">openMask</div>
+								　プログラミングの資料の隠れてる部分を一々押して表示するの面倒くさいからスクロールするだけで表示状態にしてくれるようにしました。怒られるかな？
+								<div class="tags">#javascript</div>
+							</div>
+						</span>
+					</div>
+				</div>
+			</div>
+			<div id="footer"></div>	
+		</div>
+	</body>
+</html>

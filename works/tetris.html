@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="utf-8">	
+	<title></title>
+	<script type="text/javascript">
+		var field = [];
+		//var vw = document.documentElement.clientWidth;
+		var vh = document.documentElement.clientHeight;
+		var block_size = Math.floor(((vh/20)*20)/23);
+		var game_state = "play";
+		var consective = 0;
+		var score = 0;
+		var mani4;
+		var next_random = Math.floor(Math.random() *7);
+		var random;
+		var x;
+		var y;
+		var state = "";
+		var color = ["yellow","lime","red","orange","blue","magenta","cyan"];
+
+		
+		var x1 = [(-1*block_size) + "px","0px",(-1*block_size) + "px",(-2*block_size) + "px",(-1*block_size) + "px",(-1*block_size) + "px",(-2*block_size) + "px"];
+		var y1 = [(-1*block_size) + "px",(-1*block_size) + "px",(-1*block_size) + "px","0px","0px","0px",(-1*block_size) + "px"];
+
+		var x2 = ["0px",block_size + "px","0px",(-1*block_size) + "px","0px","0px",(-1*block_size) + "px"];
+		var y2 = [(-1*block_size) + "px",(-1*block_size) + "px",(-1*block_size) + "px","0px","0px","0px",(-1*block_size) + "px"];
+
+		var x3 = [(-1*block_size) + "px",(-1*block_size) + "px","0px","0px",block_size + "px",block_size + "px","0px"];
+		var y3 = ["0px","0px","0px","0px","0px","0px",(-1*block_size) + "px"];
+
+		var x4 = ["0px","0px",block_size + "px","0px",(-1*block_size) + "px","0px",block_size + "px"];
+		var y4 = ["0px","0px","0px",(-1*block_size) + "px",(-1*block_size) + "px",(-1*block_size) + "px",(-1*block_size) + "px"];
+
+		var error_count = 0;
+		function error() {
+			if (error_count < 3) {
+				alert("You can't Cheat.");
+			} else if (error_count == 3) {
+				alert("If You Cheat any more,I won't Tolerate.");
+			} else if (error_count == 4) {
+				alert("OK,I see.\nYou Are Kidding,Aren't You?");
+			} else if (error_count == 5){
+				alert("This Is your last Chance.");
+			} else {
+				alert("umm...");
+				alert("I got angry. However,I am gentle.\nSo,I will tolerate you.");
+				alert("One the other hand,I also think you deserve to be punished.");
+				window.close();
+			}
+
+			error_count++;
+		}
+
+		function right() {
+			if (game_state == "play") {
+				manipulate.style.left = manipulate.getBoundingClientRect().left - block_size + "px";
+			}
+
+			for (var i = 1; i < 5; i++) {
+				x = document.getElementById('manipulation_' + String(i)).getBoundingClientRect().left/block_size;
+				y = document.getElementById('manipulation_' + String(i)).getBoundingClientRect().top/block_size;
+
+				if (field[Math.round(x + (y * 12))] != "e") {
+					left();
+				}
+			}
+		}
+
+		function left() {
+			if (game_state == "play") {
+				manipulate.style.left = manipulate.getBoundingClientRect().left + block_size + "px";
+			}
+		
+			for (var i = 1; i < 5; i++) {
+				x = document.getElementById('manipulation_' + String(i)).getBoundingClientRect().left/block_size;
+				y = document.getElementById('manipulation_' + String(i)).getBoundingClientRect().top/block_size;
+
+				if (field[Math.round(x + (y * 12))] != "e") {
+					right();
+				}
+			}
+		}
+
+		function down() {
+			if (game_state == "play") {
+				manipulate.style.top = manipulate.getBoundingClientRect().top + block_size + "px";			
+			}
+
+			for (var i = 1; i < 5; i++) {
+				x = document.getElementById('manipulation_' + String(i)).getBoundingClientRect().left/block_size;
+				y = document.getElementById('manipulation_' + String(i)).getBoundingClientRect().top/block_size;
+
+				if (field[Math.round(x + (y * 12))] != "e") {
+					manipulate.style.top = manipulate.getBoundingClientRect().top - block_size + "px";
+					state = "hit";
+
+					if (y == 0) {
+						game_state = "over";
+						console.log(game_state);
+					}
+				}
+			}
+		}
+
+		function rotate() {
+			var top_x = document.getElementById('manipulation_1').getBoundingClientRect().left;
+			var top_y = document.getElementById('manipulation_1').getBoundingClientRect().top;
+
+			var bottom_x = document.getElementById('manipulation_2').getBoundingClientRect().left;
+			var bottom_y = document.getElementById('manipulation_2').getBoundingClientRect().top;
+
+			let radian = Math.atan2( bottom_y - top_y, bottom_x - top_x );
+			let degree = radian * (180 / Math.PI);
+			let new_degree = degree + 90;
+
+			if (game_state == "play") {
+				manipulate.style.transform = "rotateZ(" + new_degree + "deg)";
+			}
+
+			for (var i = 1; i < 5; i++) {
+				x = document.getElementById('manipulation_' + String(i)).getBoundingClientRect().left/block_size;
+				y = document.getElementById('manipulation_' + String(i)).getBoundingClientRect().top/block_size;
+
+				if (field[Math.round(x + (y * 12))] != "e") {	
+
+				manipulate.style.transform = "rotateZ(" + degree + "deg)";
+				}
+			}			
+		}
+
+		function declaration() {
+			document.onkeydown = function(e) {
+				var keyCode = false;
+
+				if (e) event = e;
+
+				if (event) {
+					if (event.keyCode) {
+						keyCode = event.keyCode;
+					} else if (event.which) {
+						keyCode = event.which;
+					}
+				}
+
+				if (keyCode == "39") {
+					left();
+				} else if (keyCode == "37") {
+					right();
+				} else if (keyCode == "40") {
+					down();			
+				} else if (keyCode == "38") {
+					rotate();
+				} else if (keyCode == "32") {
+					if (game_state == "play") {
+						game_state = "pause";
+					} else if (game_state == "pause") {
+						game_state = "play";
+					}
+				} else if (keyCode == "82") {
+					window.location = location.href;
+				}
+			};			
+		}
+
+
+
+	</script>
+<link rel="stylesheet" type="text/css">	
+</head>
+
+<style type="text/css">
+	html {
+		overflow: hidden;
+	}
+
+	body {
+		width: 100vw;
+		height: 100vh;
+		background-color: #111;
+	}
+
+	#field {
+		position: fixed;
+		top: 0px;
+		left: 0px;
+	}
+
+	#field div:not(.float_clear) {
+		-webkit-box-sizing: border-box;
+		float: left;	
+	}
+
+	.wall {
+		background-color: #555;
+		border: outset 3px #222;
+		color: #222;
+		text-align: center;
+		user-select: none;
+	}
+
+	.empty {
+		background-color: #000;
+		border:solid 3px #000;
+	}
+
+	.red {
+		background-color: #f00;
+		border: outset 3px #c00;	
+	}
+
+	.yellow {
+		background-color: #ff0;
+		border: outset 3px #cc0;		
+	}
+
+	.orange {
+		background-color: #ffa500;
+		border: outset 3px #cc7200; 
+	}
+
+	.magenta {
+		background-color: #f0f;
+		border: outset 3px #c0c;	
+	}
+
+	.lime {
+		background-color: #0f0;
+		border: outset 3px #0c0;	
+	}
+
+	.cyan {
+		background-color: #0ff;
+		border: outset 3px #0cc;	
+	}
+
+	.blue {
+		background-color: #00f;
+		border: outset 3px #00c;	
+	}
+
+	#manipulation {
+		opacity: 0;
+		width: 0px;
+		height: 0px;
+		position: fixed;
+	}
+
+	#manipulation div:not(.float_clear) {
+		position: absolute;
+		box-sizing: border-box;
+	}
+
+	#next {
+		background-color: #111;
+		position: fixed;
+		top: 0px;
+	}
+
+	#next div:not(.float_clear,.next_manipulation) {
+		box-sizing: border-box;
+		float: left;	
+	}
+
+	#next_manipulation {
+		opacity: 0;
+		width: 0px;
+		height: 0px;
+		position: fixed;
+	}
+
+	#next_manipulation div {
+		box-sizing: border-box;
+		position: absolute;	
+	}
+
+	#others {
+		position: fixed;
+		background-color: #111;
+	}
+
+	#others div:not(.float_clear) {
+		box-sizing: border-box;	
+		float: left;	
+		color: #fff;
+		text-align: center;	
+		user-select: none;
+	}
+
+	#show {
+		width: 50vw;
+		height: 100vh;
+		font-size: 10vh;
+		text-align: center;
+		position: fixed;
+		right: 0px;
+		top: 0px;
+		color: #fff;
+		opacity: 0;
+		user-select: none;
+		display: grid;
+		place-items: center;
+	}
+
+	#show .sub {
+		all:initial;
+		font-size: 0.5em;
+
+		animation-name: flashing;
+		animation-duration: 2s;
+		animation-iteration-count: infinite;
+		animation-timing-function: linear;
+	}
+
+	@keyframes flashing {
+		0% {
+			color: #fff;
+		}
+
+		50% {
+			color: #0ff;
+		}
+
+		100% {
+			color: #fff;
+		}
+	}
+
+	.float_clear {
+		clear: both;
+		width: 0px;
+		height: 0px;
+	}
+
+
+</style>
+
+<body>
+	<div id="field">
+
+	</div>
+
+	<div id="next">
+		<div id="next_manipulation">
+			<div id="next_manipulation_1"></div>
+			<div id="next_manipulation_2"></div>
+			<div id="next_manipulation_3"></div>
+			<div id="next_manipulation_4"></div>		
+		</div>		
+	</div>
+
+	<div id="others">
+		
+	</div>
+
+	<div id="manipulation">
+		<div id="manipulation_1"></div>
+		<div id="manipulation_2"></div>
+		<div id="manipulation_3"></div>
+		<div id="manipulation_4"></div>		
+	</div>
+
+	<div id="show">
+		GAME OVER<br>
+		<div class="sub" onclick="press()">press R to play again</div>
+	</div>
+</body>
+<script type="text/javascript">
+	// start set up about size
+	for (var i = 1; i < 5; i++) {
+		document.getElementById('manipulation_' + String(i)).style.cssText = "width: " + block_size + "px; height: " + block_size + "px; border-width: " + (block_size/6) + "px;";
+	}
+
+	for (var i = 1; i < 5; i++) {
+		document.getElementById('next_manipulation_' + String(i)).style.cssText = "width: " + block_size + "px; height: " + block_size + "px; border-width: " + (block_size/6) + "px;";
+	}
+
+	document.getElementById('field').style.cssText = "width: " + (block_size*12) + "px; height: " + (block_size*23) + "px;";
+
+	document.getElementById('next').style.cssText = "width: " + (block_size*6) + "px; height: " + (block_size*6) + "px; left: " + (block_size*12) + "px;";
+
+	document.getElementById('others').style.cssText = "width: " + (block_size*7) + "px; height: " + (block_size*17) + "px; left: " + (block_size*12) + "px; top: " + (block_size*6) + "px;";
+
+	document.getElementById('next_manipulation').style.cssText = "left: " + (block_size*15) + "px; top: " + (block_size*3) + "px;";
+
+	var manipulate = document.getElementById('manipulation');
+
+	var div = "";
+	var float = "";
+
+	var count = 0;
+
+	//create field
+	var for_agent = function() {
+		div = document.createElement("div");
+		div.id = count;
+		div.style.cssText = "width: " + String(block_size) + "px; height: " + String(block_size) + "px; border-width: " + (block_size/6) + "px;";
+
+		if ((count+1)%12 == 0) {
+			field.push("sw");//side_wall
+			div.className = "wall";
+
+			float = document.createElement("div");
+			float.className = "float_clear";
+
+			document.getElementById('field').appendChild(div);
+			document.getElementById('field').appendChild(float);									
+		}else if ((count+1)%12 == 1) {
+			field.push("sw");
+			div.className = "wall";
+			document.getElementById('field').appendChild(div);			
+		}else if ((count+1) > 264) {
+			field.push("bw");//bottom_wall
+			div.className = "wall";
+			document.getElementById('field').appendChild(div);
+		} else {
+			field.push("e");
+			div.className = "empty";
+			document.getElementById('field').appendChild(div);
+		}	
+
+		count++;
+	}
+
+	var interval = setInterval(function() {for_agent();
+		if (count > 275) {
+			clearInterval(interval);
+			count = 0;
+			next();
+		}
+	},10);
+
+	function next() {
+		var for_agent = function() {
+			div = document.createElement('div');
+			div.style.cssText = "width: " + block_size + "px; height: " + block_size + "px; border-width: " + (block_size/6) + "px; line-height: " + block_size + "px; font-size: " + ((block_size/4)*3) + "px;";
+			if (count < 6 || count >= 29) {
+				div.className = "wall";
+
+				if (count == 1) {
+					div.innerHTML = "N";
+				} else if (count == 2) {
+					div.innerHTML = "E";
+				} else if (count == 3) {
+					div.innerHTML = "X";
+				} else if (count == 4) {
+					div.innerHTML = "T";
+				}
+			} else if ((count+1)%6 == 0 || (count+1)%6 == 1) {
+				div.className = "wall";
+			} else {
+				div.className = "empty";
+			}
+
+			document.getElementById('next').appendChild(div);
+
+			if ((count+1)%6 == 0) {
+				float = document.createElement('div');
+				float.className = "float_clear";
+				document.getElementById('next').appendChild(float);
+			}
+
+			count++;
+		}
+
+		interval = setInterval(function() {for_agent();
+			if (count > 35) {
+				clearInterval(interval);
+				count = 0;
+				others();
+			}
+		},10)
+	}
+
+	function others() {
+		var for_agent = function() {
+			div = document.createElement('div');
+			div.style.cssText = "width: " + block_size + "px; height: " + block_size + "px; border-width: " + (block_size/6) + "px; line-height: " + block_size + "px; font-size: " + ((block_size/4)*3) + "px;";
+
+			if (count <= 7 || count >= 112 || (count+1)%7 == 0 || (count+1)%7 == 1) {
+				div.className = "wall";
+			} else {
+				div.className = "empty";
+
+				if ((count >= 8 && count <= 12) || (count >= 15 && count <= 19)) {
+					div.setAttribute('onclick','error()');
+				}
+
+				if (count == 8) {
+					div.innerHTML = "S";
+				} else if (count == 9) {
+					div.innerHTML = "C";
+				} else if (count == 10) {
+					div.innerHTML = "O";
+				} else if (count == 11) {
+					div.innerHTML = "R";
+				} else if (count == 12) {
+					div.innerHTML = "E";
+				}
+
+				if (count == 15) {
+					div.innerHTML = "0";
+					div.id = "score_0";
+				} else if (count == 16) {
+					div.innerHTML = "0";
+					div.id = "score_1";
+				} else if (count == 17) {
+					div.innerHTML = "0";
+					div.id = "score_2";
+				} else if (count == 18) {
+					div.innerHTML = "0";
+					div.id = "score_3";
+				} else if (count == 19) {
+					div.innerHTML = "0";
+					div.id = "score_4";
+				}
+			}
+
+			document.getElementById('others').appendChild(div);
+
+			if ((count+1)%7 == 0) {
+				float = document.createElement('div');
+				float.className = "float_clear";
+				document.getElementById('others').appendChild(float);
+			}
+
+			count++;
+		}
+
+		interval = setInterval(function() {for_agent();
+			if (count > 118) {
+				clearInterval(interval);
+				if (game_state == "play") {
+					start();
+					declaration();
+				}
+				
+			}
+		},10)
+	}
+
+	function add_score() {
+		score = score + (10**consective);
+		console.log(score);
+		consective = 0;
+		count = 0;
+
+		for (var i = 0; i < 5; i++) {
+			document.getElementById('score_' + String(i)).innerHTML = "0";
+		}
+
+		for (var i = (String(score).length*-1)+5; i < 5; i++) {
+			document.getElementById('score_' + String(i)).innerHTML = String(score).charAt(count);
+			count++;
+		}
+	}
+
+	function remove() {
+		for (var i = 0; i < 22; i++) {
+			var start_point = (i + 1) * 12;
+			var end_point = start_point + 12;
+			var check = [];
+
+			for (var j = start_point; j < end_point; j++) {
+				check.push(field[j]);
+			}
+
+			if (check.indexOf("e") == -1 && check.indexOf("bw") == -1) {
+				consective++;
+				field.splice(start_point,12);
+				field.unshift("sw","e","e","e","e","e","e","e","e","e","e","sw");
+				replace();
+			}
+		}
+	}
+
+	function replace() {
+		if (game_state == "play") {
+			for (var i = 0; i < 276; i++) {
+				if (field[i] == "sw" || field[i] == "bw") {
+					document.getElementById(String(i)).className = "wall";
+				} else if (field[i] == "e") {
+					document.getElementById(String(i)).className = "empty";
+				} else {
+					document.getElementById(String(i)).className = field[i];
+				}
+				remove();
+			}					
+		}
+	}
+
+	function dicision() {
+		for (var i = 1; i < 5; i++) {
+			x = document.getElementById('manipulation_' + String(i)).getBoundingClientRect().left/block_size;
+			y = document.getElementById('manipulation_' + String(i)).getBoundingClientRect().top/block_size;
+
+			if (y <= 0 ) {
+				game_state = "over";
+			} else {
+				field.splice(Math.round(x + (y * 12)),1,color[random]);	
+			}	
+		}
+
+		replace();
+		if (game_state == "play") {
+			start();
+			add_score();
+		} else if (game_state == "over") {
+			document.getElementById('show').style.opacity = "1";
+		}
+	}
+
+	function start() {
+		if (game_state == "play") {
+			random = next_random;
+			next_random = Math.floor(Math.random() * 7);				
+		}
+
+		document.getElementById('manipulation').style.opacity = "1";
+		document.getElementById('manipulation').style.top = block_size + "px";
+		document.getElementById('manipulation').style.left = (block_size * 6) + "px";//*6
+		document.getElementById('manipulation').style.transform = "rotateZ(0deg)";
+
+		document.getElementById('next_manipulation').style.opacity = "1";
+		document.getElementById('next_manipulation').style.transform = "rotateZ(0deg)";
+
+
+
+		var mani4 = document.getElementById('next_manipulation_1');
+			mani4.style.left = x1[next_random];
+			mani4.style.top = y1[next_random];
+			mani4.className = color[next_random];
+
+		var mani4 = document.getElementById('next_manipulation_2');
+			mani4.style.left = x2[next_random];
+			mani4.style.top = y2[next_random];
+			mani4.className = color[next_random];
+
+		var mani4 = document.getElementById('next_manipulation_3');
+			mani4.style.left = x3[next_random];
+			mani4.style.top = y3[next_random];
+			mani4.className = color[next_random];
+
+		var mani4 = document.getElementById('next_manipulation_4');
+			mani4.style.left = x4[next_random];
+			mani4.style.top = y4[next_random];
+			mani4.className = color[next_random];
+
+			//now
+
+		var mani4 = document.getElementById('manipulation_1');
+			mani4.style.left = x1[random];
+			mani4.style.top = y1[random];
+			mani4.className = color[random];
+
+		var mani4 = document.getElementById('manipulation_2');
+			mani4.style.left = x2[random];
+			mani4.style.top = y2[random];
+			mani4.className = color[random];
+
+		var mani4 = document.getElementById('manipulation_3');
+			mani4.style.left = x3[random];
+			mani4.style.top = y3[random];
+			mani4.className = color[random];
+
+		var mani4 = document.getElementById('manipulation_4');
+			mani4.style.left = x4[random];
+			mani4.style.top = y4[random];
+			mani4.className = color[random];
+
+		var fall = setInterval(function() {down();
+			if (state == "hit") {
+				clearInterval(fall);
+				dicision();
+
+				state = "";
+			}
+		},500);					
+	}
+
+	//press r
+	var press_count = 0;
+	var sentence = "";
+	function press() {
+		if (press_count < 3) {
+			alert('Not Here.\nRead the Letter.');
+		} else if (press_count == 3) {
+			alert("I'm Telling You it's Not.");
+		} else if (press_count == 4) {
+			alert('Cut it Out!');
+		} else if (press_count == 5) {
+			alert("I'll Be Angry.");
+		} else if (press_count > 5 && press_count < 9) {
+			for (var i = 0; i < press_count-5; i++) {
+				sentence = sentence + "...";
+			}
+
+			alert(sentence);
+		} else if (press_count == 9) {
+			alert('Yeah,All Right.\nJust Have to Do it,right?');
+			window.location = location.href;
+		}
+
+		press_count++;
+	}
+</script>
+</html>
