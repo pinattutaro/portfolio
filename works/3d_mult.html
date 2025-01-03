@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+  <meta charset="utf-8">
+</head>
+<body>
+  <style>
+    body {
+      overflow: hidden;
+
+      div, canvas {
+        float: left;
+      }
+    }
+
+    #cvs {
+      border: solid 1px #000;
+      box-sizing: border-box;
+    }
+
+    #colorSelect {
+      border: solid 1px #000;
+      box-sizing: border-box;
+      width: 100px;
+      height: 100px;
+      display: grid;
+    }
+
+    input[type="color"] {  
+      -webkit-appearance: none;
+      appearance: none;
+      border-width: 0px;
+      background: none;
+      cursor: pointer;
+      padding: 0px;
+      margin: 0px;
+      grid-column: 1;
+      grid-row: 1;
+
+      &#border {
+        width: 100px;
+        height: 100px;
+      }
+
+      &#inner {
+        width: 80px;
+        height: 80px;
+        margin: 10px 10px;
+      }
+    }
+
+    input[type="color"]::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+
+    #modeSelector {
+
+      & > div {
+        width: 100px;
+        height: 100px;
+        border: solid 1px #000;
+        float: left;
+        box-sizing: border-box;  
+
+        &.selected {
+          box-shadow: none;
+        }
+
+        &:not(.selected) {
+          box-shadow: 0px 10px 5px #ccc;
+        }
+
+        & > svg {
+          position: absolute;
+          transform-origin: 0 0;
+
+          &#pen {
+            transform: scale(0.6) rotate(30deg);
+            margin-left: 63px;
+            margin-top: 3px;
+          }
+
+          &#eraser {
+            transform: scale(0.65) rotate(30deg);
+            margin-left: 50px;
+            margin-top: 7px; 
+          }
+        }
+      }
+    }
+
+    .floatclaer {
+      clear: both;
+    }
+  </style>
+
+  <canvas id="cvs" width="600" height="600"></canvas>
+  <div id="selectors">
+    <div id ="colorSelect">
+      <input type="color" id="border" value="#000000" placeholder="border">
+      <input type="color" id="inner" value="#ffffff" placeholder="inner">    
+    </div>
+
+    <div class="floatclaer"></div>
+
+    <div id="modeSelector">
+      <div id="penButton" class="selected" data-mode="1">
+        <svg id="pen" stroke="#000" stroke-width="2" width="30" height="170" fill="black">
+          <rect x="0" y="0" width="30" height="20" rx="5" ry="5"></rect>
+          <rect x="0" y="15" width="30" height="5"></rect>
+          <rect x="0" y="30" width="30" height="100"></rect>
+          <polygon points="2,130 15,170 28,130" fill="none"></polygon>
+          <polygon points="15,170 18.25,160 11.75,160"></polygon>
+        </svg>
+      </div>
+
+      <div id="eraserButton" data-mode="-1">
+        <svg id="eraser" stroke="#000" stroke-width="2" width="60" height="116" fill="black">
+          <rect x="0" y="0" width="60" height="90"></rect>
+          <rect x="2" y="75" width="56" height="40" rx="10" ry="10" fill="none"></rect>
+          <rect x="20" y="0" width="20" height="90" fill="white"></rect>
+        </svg>
+      </div>
+    </div> 
+  </div>
+
+
+
+  <script type="text/javascript">
+    const sin = Math.sin;
+    const cos = Math.cos;
+    const tan = Math.tan;
+    const cot = function(theta) {
+      return 1/tan(theta);
+    }
+
+    const R = {
+      x : function(ang){
+        return [[1,0,0,0,cos(ang),-1*sin(ang),0,sin(ang),cos(ang)],[3,3]];
+      },
+      y : function(ang){
+        return [[cos(ang),0,-1*sin(ang),0,1,0,sin(ang),0,cos(ang)],[3,3]];
+      }
+    };
+
+    function deepCopy(array) {
+       return JSON.parse(JSON.stringify(array));
+      //return array.map(innerArray => innerArray.slice());
+    }
+
+    function product(a,b) {
+      if (typeof(a) != "object" && typeof(b) != "object") return undefined;
+      if (typeof(a) == "number") {
+        let ans = [[],b[1]];
+        for (let i = 0; i < b[0].length; i++) {
+          ans[0].push(b[0][i]*a);
+        }
+        return ans;
+      }
+
+      if (a[1][1] != b[1][0]) {return undefined;}
+      const height = a[1][0];
+      const width = b[1][1];
+      let ans = [[],[height,width]];
+      for (let h = 0; h < height; h++) {
+        for(let w = 0; w < width; w++) {
+          const key = w + width*h;
+          ans[0][key] = 0;
+
+          for (let i = 0; i < a[1][1]; i++) {
+            ans[0][key] += (a[0][h*a[1][1] + i]) * (b[0][w + i*b[1][1]]);
+          }
+        }
+      }
+
+      return ans;
+    };
+
+    function sum(a,b) {
+      if (a[1][0] != b[1][0] || a[1][1] != b[1][1]) {return undefined;}
+      let ans = [[],b[1]];
+      for (let i = 0; i < b[0].length; i++) {
+        ans[0].push(b[0][i] + a[0][i]);
+      }
+
+      return ans;
+    }
+
+    function inMatrix2x2(a) {
+      if(a[1][0] != 2 || a[1][1] != 2) return undefined;
+      const factor = a[0]
+      const det = factor[0]*factor[3] - factor[1]*factor[2];
+      if (Math.abs(det) == 0) return undefined;
+      return product(1/det, [[factor[3], factor[1]*-1, factor[2]*-1, factor[0]],[2,2]]);
+    }
+
+    function cuboidFace(cube) {
+      const start = cube[0];
+      const size = cube[1];
+      const info = cube[2].slice();
+      //console.log(info);
+      info.splice(1,0,0);
+      //console.log(info);
+      let sides = [];//side bars vector
+      for(let j = 0; j < 3; j++) {
+        let side = [[0,0,0],[3,1]];
+        side[0][j] = cube[1][0][j];
+        sides.push(side);
+      }
+
+      let face = [];
+
+      for (let j = 0; j < 2; j++) {
+        for(let k = 0; k < 3; k++) {
+          let tempFace = [];
+          const oFace = sum(start,product(j,size));//一時的な開始地点の指定（始点と終点が該当する）
+          tempFace.push(oFace);
+          tempFace.push(sum(oFace,product((-1)**j,sides[k])));
+          tempFace.push(sum(oFace,product((-1)**j,sum(sides[k],sides[(k+1)%3]))));
+          tempFace.push(sum(oFace,product((-1)**j,sides[(k+1)%3])));
+          tempFace.push(info.slice());
+          tempFace[4].splice(1,1,3*j+k);
+          face.push(tempFace);
+        }
+      }
+
+      return face;
+    }
+
+    function rotate(temp,matrix) {
+      let origin = deepCopy(temp);
+      for(let i=0;i<origin.length;i++) {
+        for(let j=0;j<origin[i].length - 1;j++) {
+          origin[i][j] = product(matrix, origin[i][j]);
+        }
+      }
+
+      return origin;
+    }
+
+    function project(vector) {
+      if(vector[1][1] != 1) return;
+      return [vector[0][0] + size.x/2, size.y/2 - vector[0][1]];
+    }
+
+    function align(arg) {
+      let temp = deepCopy(arg);
+      temp.sort((first,second) => {
+        const z1 = getIndex(first);
+        const z2 = getIndex(second);
+        return z1 - z2;
+      });
+
+      return temp;
+    }
+
+    function getIndex(arg) {
+      let res = 0;
+      for (let i = 0; i < 4; i++) {
+        res += arg[i][0][2] / 4;
+      }
+      return res;
+    }
+
+    function perspective(arg) {
+      const origin = deepCopy(arg);
+      for(let i=0;i<origin.length;i++) {
+        const face = origin[i];
+
+        for(let j=0;j<4;j++) {
+          const vector = face[j];
+          const index = vector[0][2];
+
+          for(let k=0;k<2;k++) {
+            vector[0][k] *= (index+vanishing)/vanishing;
+          }
+        }
+      }
+
+      return origin;
+    }
+
+    function screen(arg, cam, focal) {
+      const origin = deepCopy(arg);
+      for(let i=0;i<origin.length;i++) {
+        const face = origin[i];
+
+        for(let j=0;j<4;j++) {
+          const vector = sum(face[j], product(-1, cam));
+          const index = vector[0][2];
+
+          for(let k=0;k<1;k++) {
+            vector[0][k] *= focal/index;
+          }
+
+          face[j] = vector;
+        }
+      }
+    }
+
+    function sysEq(eq1, eq2) {//[a,b,c] (ax+by = c)
+      const matrix = [[eq1[0],eq1[1],eq2[0],eq2[1]],[2,2]];
+      const vector = [[eq1[2],eq2[2]],[2,1]];
+      const ans = product(inMatrix2x2(matrix), vector);
+      return ans[0];
+    }
+
+    function product_M(arg, matrix) {
+      const origin = deepCopy(arg);
+      for(let i=0;i<origin.length;i++) {
+        for(let j=0;j<origin[i].length;j++) {
+          const vector = origin[i][j];
+          if (vector.length > 2 && vector[1].length != 2) continue;
+          vector = product(matrix, vector);
+        }
+      }
+      return origin;
+    }
+
+    const basicSize = 50;
+    let faces = [];
+    let cuboid = [
+      [
+        [[basicSize/-2,basicSize/-2,basicSize/-2],[3,1]],
+        [[basicSize,basicSize,basicSize],[3,1]],
+        [0,"#000","rgba(255,255,255,0.5)"]
+      ]/*,
+      [
+        [[basicSize/-2,basicSize/-2,225],[3,1]],
+        [[basicSize,basicSize,basicSize],[3,1]],
+        [1,"#000","rgba(255,255,255,0.5)"]
+      ]*/
+    ];
+
+    const canvas = document.getElementById('cvs');
+    const cvs = canvas.getContext('2d');
+    const size = {
+      x: canvas.width,
+      y: canvas.height
+    };
+
+    const pi = Math.PI;
+    const section = 5 * pi / 180;
+    let angle = [0,0];
+    let clients;
+    let showFaces;
+    let colors = ["#000","#fff"];
+    let mode = 1;
+    let created = 0;
+    const vanishing = 1000;
+    let camera = [[0,0,1000],[3,1]];
+    let camAng = [0,0];//Yray,Xray
+    const focus = 170;//focal length
+
+    function paint() {//:IO()
+      //console.log("paint");
+      cvs.clearRect(0,0,size.x,size.y);
+      const xyMatrix = product(R.x(angle[0]),R.y(angle[1]));
+      showFaces = align(rotate(faces, xyMatrix));
+      //showFaces = screen(showFaces);
+
+      //showFaces = perspective(showFaces);
+      //if(clients) over(clients,showFaces);
+
+      for(let j=0;j<showFaces.length;j++) {
+        const face = deepCopy(showFaces[j]);
+        const style = face.pop();
+
+        cvs.beginPath();
+        cvs.strokeStyle = style[2];
+        cvs.fillStyle = style[3];
+        cvs.lineWidth = 1;
+
+        for (let k = 0; k < 5; k++) {
+          const index = k%4;
+          const tempVec = project(face[index]);
+          cvs.lineTo(tempVec[0],tempVec[1]);
+        }
+        cvs.stroke();
+        cvs.fill();
+        cvs.closePath();
+      }
+    }
+
+    function searchCube(id) {//:IO()
+      const res = (function() {
+        for (let i = 0; i < cuboid.length; i++) {
+          if(cuboid[i][2][0] == id) return cuboid[i];
+        }
+      }());
+      return res;
+    }
+
+    function searchFace(cube, face) {//:IO()
+      const res = (function() {
+        for (let i = 0; i < faces.length; i++) {
+          const temp = faces[i][4];
+          if(temp[0] == cube && temp[1] == face) return faces[i];
+        }
+      }());
+      return res;
+    }
+
+    function create(arg, color = ["#000","#fff"]) {//:IO()
+      const face = deepCopy(arg);
+      const info = face.pop();
+
+      const start = face[0];
+      let size = sum(face[2], product(-1,start));
+      const eray = (function() {
+        let res = [[0,0,0],[3,1]];
+        for (let i = 0; i < 3; i++) {
+          if(size[0][i] == 0) res[0][i] = basicSize;
+        }
+        return res;
+      }());
+
+      const cubeInfo = searchCube(info[0]);
+      const cube = JSON.stringify(cuboidFace(cubeInfo));
+      for(let i=0; i<2; i++) {
+        const temp = JSON.stringify(sum(start, product((-1)**i, eray)));
+
+        if(cube.indexOf(temp) == -1) size = sum(size, product((-1)**i, eray));
+      }
+
+      if(size[0][0] == 0 || size[0][1] == 0 || size[0][2] == 0) return;
+
+      created++;
+      const newCube = [start, size, [created, color[0], color[1]]];
+      cuboid.push(newCube);
+      pushFaces();
+      paint();
+    }
+
+    function deletion(arg) {//:IO()
+      const face = deepCopy(arg);
+      const info = face.pop();
+      const index = (function() {
+        for (let i = 0; i < cuboid.length; i++) {
+          if (cuboid[i][2][0] == info[0]) return i;
+        }
+      }());
+      console.log(index);
+      cuboid.splice(index,1);
+      pushFaces();
+      paint();
+    }
+
+    function pushFaces() {//:IO()
+      faces = [];
+      for(let i=0;i<cuboid.length;i++) {
+        const tempFace = cuboidFace(cuboid[i]);
+        tempFace.forEach((e) => {
+          faces.push(e);
+        })
+      }      
+    }
+
+    pushFaces();
+    paint();//初期描画
+
+    function over(point,vectors) {
+      let res;
+
+      for (let i = 0; i < vectors.length; i++) {
+        const face = deepCopy(vectors[i]);
+        const info = face.pop();
+        const origin = [face[0][0][0],face[0][0][1]];
+        const v1 = [face[1][0][0],face[1][0][1]];
+        const v2 = [face[3][0][0],face[3][0][1]];
+        const matrix = [[v1[0]-origin[0],v2[0]-origin[0],v1[1]-origin[1],v2[1]-origin[1]],[2,2]];
+        const inMtx = inMatrix2x2(matrix);
+        if (!inMtx) continue;//逆行列が存在しない場合
+        const abVec = conAbVec(point);
+        const pVec = [[abVec[0]-origin[0],abVec[1]-origin[1]],[2,1]];
+        const prime = product(inMtx, pVec);
+        if(prime[0][0] >= 0 && prime[0][0] <= 1 && prime[0][1] >= 0 && prime[0][1] <= 1) {
+          res = searchFace(info[0],info[1]);
+        }
+      }
+
+      if(!res) return undefined;
+      return res;
+    }
+
+    /*function over(point, vectors) {
+      let res;
+
+      for(let i=0;i<vectors.length;i++) {
+        const face = deepCopy(vectors[i]);
+        const info = face.pop();
+        const cPoint = conAbVec(point);
+
+        const def = [0,1,point[1]];
+        for(let j=0;j<4;j++) {
+
+        }
+      }
+    }*/
+
+    function conAbVec(point) {//x,y
+      return [point[0] - size.x/2, size.y/2 - point[1]];
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+
+    document.addEventListener('keydown',(e) => {
+      const code = e.keyCode;
+      console.log(code);
+      switch(code){
+        case 38 : angle[0] -= section;break;
+        case 40 : angle[0] += section;break;
+        case 39 : angle[1] -= section;break;
+        case 37 : angle[1] += section;break;
+        //case 32 : drow();break;//debag
+      }
+      paint();
+    });
+
+    let mouse;
+    const r = 0.01;
+    document.addEventListener('mouseup',() => {
+      mouse = 0;
+      clients = undefined;
+      paint();
+    });
+
+    canvas.addEventListener('mousedown',(e) => {
+      clients = [e.offsetX,e.offsetY];
+      mouse = 1;
+      const overFace = over(clients, showFaces);
+      //console.log(overFace);
+      if (!overFace) return;
+      if(mode == 1) create(overFace, colors);
+      else if(mode == -1) deletion(overFace);
+    });
+
+    canvas.addEventListener('mousemove',(e) => {
+      if(mouse == 0 || !clients) {return;}
+
+      let dy = e.offsetY - clients[1];
+      let dx = e.offsetX - clients[0];
+
+      if(dx > 200) dx = 200;
+      if(dy > 200) dy = 200;
+
+      for (let i = 0; i < 2; i++) {
+        angle[i] = angle[i] + ((-1)**i)*([dy,dx][i])*r;
+      }
+
+      clients = [e.offsetX,e.offsetY];
+      paint();
+    });
+
+    const selectors = ["border","inner"];
+    for (let i = 0; i < 2; i++) {
+      const selector = document.getElementById(selectors[i]);
+      selector.addEventListener('change', () => {
+        colors[i] = selector.value;
+        console.log(selectors[i], selector.value);
+      });
+    }
+
+    const pe = document.getElementById('modeSelector').children;
+    for(let i=0;i<2;i++) {
+      pe[i].addEventListener('click', (e) => {
+        pe[i].className = "selected";
+        pe[(i+1)%2].className = "";
+        mode = pe[i].dataset.mode;
+      });
+    }
+  </script>
+</body>
+</html>

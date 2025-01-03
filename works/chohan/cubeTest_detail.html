@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head>
+	<title>cube</title>
+	<link rel="stylesheet" type="text/css" href="default.css">
+	<link rel="stylesheet" type="text/css" href="defaultForTopPage.css">
+	<script type="text/javascript">
+		var p_name = [];
+		var p_even = [];
+		var p_odd = [];
+		var p_info = [p_name,p_even,p_odd];
+		var p_info_kind = ["name","even","odd"];
+		var game_statement = "";
+		var paper_observ = "";
+
+		function show_result(num) {
+			var interval;
+			var field = document.createElement('div');
+			field.id = "field";
+			if (!(document.getElementById('field'))) {
+				document.body.appendChild(field);
+			}
+						
+			function paper(){
+				console.log("paper");	
+				var count = 0;
+				function create(){
+					var element = document.createElement("div");
+					element.style.left = (Math.floor(Math.random() *Math.floor(window.innerWidth)) + 1) + "px";
+					element.className = "paper" + Math.floor(Math.random() *1);
+					//var field = document.getElementById('field');
+					if (field) {
+						field.appendChild(element);
+					}
+					
+					count++;
+				}
+
+				var interval = setInterval(function() {create();
+					if (count == 25) {
+						clearInterval(interval);
+					}
+				},100);
+
+				/*for (var i = 0; i < 25; i++) {
+					var element = document.createElement('div');
+					element.className = "paper0";
+					element.style.cssText = "left: " + Math.floor(Math.random() *Math.floor(window.innerWidth)) + "px; animation-delay: " + (50*i) + "ms;";
+					document.body.appendChild(element);
+				}*/
+			}
+
+			for (var j = 1; j < 8; j++) {
+				for (var i = 0; i < 3; i++) {
+					document.getElementById('results').getElementsByClassName(p_info_kind[i])[j].innerHTML = p_info[i][j-1];
+				}
+
+				var calc_result;
+				if (num == "even") {
+					calc_result = p_info[1][j-1] * 2;
+				} else {
+					calc_result = p_info[2][j-1] * 2;
+				}
+
+				if (calc_result >= 2000) {
+					paper_observ = "paper";
+				}
+
+				document.getElementsByClassName('result')[j].innerHTML = calc_result;
+
+				document.getElementById('results').style.cssText = "opacity: 1;z-index: 120;";
+				//document.getElementById('mainGame').style.cssText = "transform-style: flat; z-index: -100;";
+			}
+
+			if (paper_observ == "paper") {
+				paper();
+				paper_observ = "";
+			}
+
+			var allForm = document.getElementById('topPage').querySelectorAll('.even,.odd');
+			//console.log(allForm);
+			for (var i = 2; i < allForm.length; i++) {
+				allForm[i].value = "";
+			}
+
+			document.getElementById('restart').addEventListener('click',()=>{
+				game_statement = "";
+
+				field.remove();
+				topPage();
+			});
+		}
+
+		function gameStart(system) {
+			game_statement = "play";
+			console.log(system);
+			//console.log(window.innerWidth);
+			document.getElementById('topPage').style.cssText = "opacity: 0;z-index: -100;";
+			document.getElementById('mainGame').style.cssText = "opacity: 1;z-index: 100;";
+			document.getElementById("role_show").style.opacity = 0;
+			var counts = [0,0];
+
+			const scale = 0.1;
+			const bound = 0.7;
+			const height = 450;
+			const friction = 0.8;
+			const fps = 50;
+			const convergent = 1 - 0.4;//-以降の部分を変えてね♡
+			const num_cube = 2 - 1;//-以前の部分を変えてね☆
+			const role_all = ["ピンゾロの丁","イチニの半","サンミチの丁",	"ヨイチの半","グイチの丁","イチロクの半","イチニの半","ニゾロの丁","サニの半","シニの丁","グニの半","ニロクの丁","サンミチの丁","サニの半","サンゾロの丁","シソウの半","グサンの丁","サブロクの半","ヨイチの半","シニの丁","シソウの半","シゾロの丁","グシの半","シロクの丁","グイチの丁","グニの半","グサンの丁","グシの半","ゴゾロの丁","ゴロクの半","イチロクの半","ニロクの丁","サブロクの半","シロクの丁","ゴロクの半","ロクゾロの丁"];
+
+
+			const deg1 = [-20,undefined,0];
+			const deg2 = [-20,undefined,-90];
+			const deg3 = [70,0,undefined];
+			const deg4 = [70,180,undefined];
+			const deg5 = [-20,undefined,90];
+			const deg6 = [-20,undefined,180];
+			const degs = [deg1,deg2,deg3,deg4,deg5,deg6];
+
+			const ran1 = Math.floor(Math.random() *6);
+			var ran2 = Math.floor(Math.random() *6);
+			
+			if (system != "normal") {
+				var system_able = Math.floor(Math.random() *4);//50%+12.5% = 62.5%
+				if (system_able == 0) {
+					if (system == "even") {
+						while((ran1 + ran2 + 2) % 2 == 1) {
+							ran2 = Math.floor(Math.random() *6);
+						}
+					} else if (system == "odd") {
+						while((ran1 + ran2 + 2) % 2 == 0) {
+							ran2 = Math.floor(Math.random() *6);
+						}						
+					}
+				}
+			}
+
+			const results = [degs[ran1],degs[ran2]];
+
+			console.log(results);
+
+			var role_name = role_all[(ran1*6) + ran2];
+			console.log(role_name);
+
+			const shaf_name = ["X","Y","Z"];
+			const plane_name = ["top","bottom","left","right","front","back"];
+			var coor1 = [[undefined,undefined],[undefined,undefined],[undefined,undefined]];
+			var coor2 = [[undefined,undefined],[undefined,undefined],[undefined,undefined]];
+			var coors = [coor1,coor2];
+
+			var widthTips = [[undefined,undefined],[undefined,undefined]];//width:[min,max],[min,max]
+			var heightTips = [[undefined,undefined],[undefined,undefined]];//height:[min,max],[min,max]
+
+			var gravity = [];
+			for (var i = 0; i < 100; i++) {
+				gravity.push(((4.9 * (i+1)**2)-(4.9 * i**2))*scale);
+			}
+
+			const ztt = ["becXR","becYR","becZR"];//zero to ten
+			const ztf = ["becX","becZ"];//zero to five
+			const ztp = ["degX","degY","degZ"];//zro to pie
+
+			var state1 = {
+				posY : 0,
+				posX : 0,
+				posZ : 0,
+				degX : -30,				
+				degY : 0,
+				degZ : 0
+			};
+
+			var state2 = {
+				posY : 0,
+				posX : 0,
+				posZ : 0,
+				degX : -30,				
+				degY : 0,
+				degZ : 0
+			};
+
+			var states = [state1,state2];
+
+			const state_name = ["posY","posX","posZ","degX","degY","degZ"];
+
+			var bector1 = {
+				becY : 0,				
+				becX : 10,
+				becZ : 10,
+				becXR : 5,								
+				becYR : 5,
+				becZR : 5,
+			};
+
+			var bector2 = {
+				becY : 0,				
+				becX : 10,
+				becZ : 10,
+				becXR : 5,								
+				becYR : 5,
+				becZR : 5,
+			};
+
+			var bectors = [bector1,bector2];
+
+			const bector_name = ["becY","becX","becZ","becXR","becYR","becZR"];
+
+			for (var h = 0; h < 2; h++) {
+				var state = states[h];
+				var bector = bectors[h];
+
+				for (var i = 0; i < ztt.length; i++) {
+					bector[ztt[i]] = Math.floor(Math.random() *21) -10;
+				}
+
+				for (var i = 0; i < ztf.length; i++) {
+					bector[ztf[i]] = Math.floor(Math.random() *31) -15;
+				}
+
+				for (var i = 0; i < ztp.length; i++) {
+					state[ztp[i]] = Math.floor(Math.random() *721)-360;
+				}	
+			}
+
+			state1["posX"] = 100;
+			state2["posX"] = -100;
+
+			for (var i = 0; i < 2; i++) {
+				bectors[i]["becZ"] = Math.floor(Math.random() *11) * (-1)**(i+1); 
+			}
+
+			const elements = document.querySelectorAll(".Z:not(#obTop)");
+
+			var circle = document.getElementsByClassName('circle');
+			for (var i = 0; i < circle.length; i++) {
+				circle[i].className = "circle";
+			}
+
+			var ranStart = Math.floor(Math.random() *10);
+			if (ranStart == 0) {
+				console.log("star");
+				var startCube = document.getElementById('ob' + (Math.floor(Math.random() *2) + 1));
+				var circle = startCube.getElementsByClassName('circle');
+				for (var i = 0; i < circle.length; i++) {
+					circle[i].className = "circle star";
+				}
+			}
+
+			function fall(s) {
+
+				for (var h = 0; h < 2; h++) {
+					var state = states[h];
+					var bector = bectors[h];
+
+					if (s == "nomal") {
+						state["posY"] = state['posY'] + bector["becY"] + gravity[counts[h]];
+					} else {
+						state["posY"][h] = hight;
+					}
+
+					for (var i = 1; i < state_name.length; i++) {
+						state[state_name[i]] = state[state_name[i]] + bector[bector_name[i]];
+						if (i >= 3) {
+							state[state_name[i]] = state[state_name[i]];
+						}
+
+						//console.log(bector_name[i] + " : " + bector[bector_name[i]]); 
+					}
+
+					elements[h].style.cssText = "transform : translateX(" + state["posX"] + "px) translateY(" + state['posY'] + "px) translateZ(" + state["posZ"] + "px) rotateX(" + state["degX"] + "deg) rotateY(" + state['degY'] + "deg) rotateZ(" + state["degZ"] + "deg);" + "z-index: " + state["posZ"] + ";";
+
+					counts[h]++;										
+				}
+
+				//getPos();
+			}
+
+			function start(){
+				var interval = setInterval(function() {fall("nomal");
+					for (var h = 0; h < 2; h++) {
+						var state = states[h];
+						var bector = bectors[h];
+						var result = results[h];
+
+						if (state['posY'] > height) {
+							//clearInterval(interval);
+							bector["becY"] = (bector["becY"] + gravity[counts[h] - 1]) * -1 * bound;
+							//console.log(bector["becY"]);
+							bector["becX"] = bector["becX"] * friction;
+							bector["becZ"] = bector["becZ"] * friction;
+							counts[h] = 0;
+
+							state["posY"] = height;
+
+							var pre_count = 0;
+							while (Math.abs(parseInt(bector["becY"])) >= Math.abs(parseInt(gravity[pre_count]))) {
+								pre_count = pre_count + 1;
+							}
+
+							pre_count = (pre_count*2);
+
+							for (var i = 0; i < 3; i++) {
+								if (result[i] != undefined) {
+									const diff = (result[i] - state[ztp[i]]) * convergent;
+									bector[ztt[i]] = diff / pre_count;
+								} else {
+									bector[ztt[i]] = bector[ztt[i]] * friction;
+								}
+							}
+						}					
+					}
+
+					getPos();
+				},1000/fps);
+
+				function flat() {
+					var count = 0
+					const angle = [1,4,9,16,25,36,49,70];
+
+					function rotate(){
+						for (var i = 0; i < 2; i++) {
+							var state = states[i];
+							var bector = bectors[i];
+							var zoom = 1 + (count/7);
+							elements[i].style.cssText = "transform: translateX(" + state["posX"] + "px) translateY(" + state['posY'] + "px) translateZ(" + state["posZ"] + "px) rotateX(" + (state["degX"] - angle[count]) + "deg) rotateY(" + state['degY'] + "deg) rotateZ(" + state["degZ"] + "deg);";
+						}
+
+						count++;
+					}
+
+					var interval = setInterval(function() {rotate();
+						if (count == angle.length) {
+							clearInterval(interval);
+						}
+					},50);
+				}
+
+				function fin() {
+					const show = document.getElementById("role_show");
+					show.style.opacity = "1";
+					show.style.display = "block";
+					show.innerHTML = role_name;
+
+					document.getElementById('command_click').style.display = "block";
+
+					game_statement = "finished";
+
+					//flat();
+				}
+
+				function getPos() {
+					game_statement = "";
+					for (var h = 0; h < 2; h++) {
+						var state = states[h];
+						var bector = bectors[h];
+						var coor = coors[h];
+
+						//const parent = document.getElementsByClassName('Z')[h];
+						const parent = document.querySelectorAll('.Z:not(#obTop)')[h];
+						const parts = parent.getElementsByClassName('parts');
+						var min = parts[0].getBoundingClientRect().left;			
+						var max = parts[0].getBoundingClientRect().right;
+						for (var i = 1; i < 6; i++) {
+							var pos = parts[i].getBoundingClientRect();
+							min = Math.min(min,pos.left);
+							max = Math.max(max,pos.right);
+						}
+						//console.log(min + " : " + max);
+
+						if (min == widthTips[h][0] || max == widthTips[h][1]) {
+							clearInterval(interval);
+							console.log("fin");
+							fin();
+							return;
+						} else {
+							widthTips[h][0] = min;
+							widthTips[h][1] = max;
+
+							if (min <= 0) {
+								bector["becX"] = bector["becX"] * bound * -1;
+								state["posX"] = state["posX"] + Math.abs(min);
+							} else if (max >= window.innerWidth) {
+								bector["becX"] = bector["becX"] * bound * -1;
+								state["posX"] = state["posX"] + window.innerWidth - max;
+							}
+						}
+
+						var left;
+						const push = 1 + (bound**2);
+
+						if (Math.abs(states[0]["posZ"] - states[1]["posZ"]) < 141.421356) {
+							if (widthTips[0][0] < widthTips[1][0] && widthTips[1][0] <= widthTips[0][1]) {
+								if (bectors[0]["becX"] >= 0) {
+									bectors[0]["becX"] = bectors[0]["becX"] * -1 * (bound**2);
+								} else {
+									bectors[0]["becX"] = bectors[0]["becX"] * push;
+								}
+
+								if (bectors[1]["becX"] <= 0) {
+									bectors[1]["becX"] = bectors[1]["becX"] * -1 * (bound**2);
+								} else {
+									bectors[1]["becX"] = bectors[1]["becX"] * push;
+								}	
+
+								const over = Math.abs(widthTips[1][0] - widthTips[0][1]) / 2;
+								states[0]["posX"] = states[0]["posX"] - over;
+								states[1]["posX"] = states[1]["posX"] + over; 			
+							} else if (widthTips[1][0] < widthTips[0][0] && widthTips[0][0] <= widthTips[1][1]) {
+								if (bectors[0]["becX"] <= 0) {
+									bectors[0]["becX"] = bectors[0]["becX"] * -1 * (bound**2);
+								} else {
+									bectors[0]["becX"] = bectors[0]["becX"] * push;
+								}
+
+								if (bectors[1]["becX"] >= 0) {
+									bectors[1]["becX"] = bectors[1]["becX"] * -1 * (bound**2);
+								} else {
+									bectors[1]["becX"] = bectors[1]["becX"] * push;
+								}	
+
+								const over = Math.abs(widthTips[0][0] - widthTips[1][1]);
+								states[0]["posX"] = states[0]["posX"] + over;
+								states[1]["posX"] = states[1]["posX"] - over; 								
+							}
+						}
+					}
+				}							
+			}
+
+			start();
+
+			document.getElementById('mainGame').addEventListener('click',()=>{
+				if (game_statement == "finished") {
+					console.log("result");
+					document.getElementById('command_click').style.display = "none";
+
+					var amount = ran1 + ran2;
+					if (amount%2 == 0) {
+						show_result("even");
+					} else {
+						show_result("odd");
+					}
+				}
+			});
+
+			document.addEventListener("keydown",(e)=>{
+				if (e.key == "e") {
+					clearInterval(interval);
+				} else if (e.key == "s") {
+					start();
+				}
+			});	
+		}
+
+		function topPage() {
+			var system = "normal";
+			document.getElementById('mainGame').style.cssText = "opacity: 0; z-index: -100;";
+			document.getElementById('topPage').style.cssText = "opacity: 1; z-index: 100;";
+			document.getElementById('results').style.cssText = "opacity: 0; z-index: -100;"
+
+			const number = document.getElementById('backdrop').querySelectorAll(".odd,.even");
+			var name = ["A","B","C","D","E","F","G"];
+			var even = [0,0,0,0,0,0,0];
+			var odd = [0,0,0,0,0,0,0];
+			number.forEach((e)=>{
+				var key = e.key;
+				var correct = ["Backspace","Delete","Arrow","F"];
+				e.addEventListener("keydown",(e)=>{
+					if (key * 0 != 0 && correct.indexOf(e) != -1) {
+						e.preventDefault();
+					}
+				});
+
+				e.addEventListener('input',()=>{
+					var num = e.value.replace(/[０-９]/g, function(s){
+    					return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
+  					});
+
+  					e.value = num;
+
+	                if(e.value.match(/^[0-9]+$/)==null){
+	                    e.value = "";
+	                }
+
+					if (e.value > 1000) {
+						e.value = 1000;
+					}
+				});
+			});
+
+			document.getElementById('ableToEven').addEventListener("click",()=>{
+				system = "even";
+			});
+
+			document.getElementById('ableToOdd').addEventListener("click",()=>{
+				system = "odd";
+			});
+
+			document.getElementById("title").addEventListener('click',()=>{
+				if (game_statement == "play") {return;}
+				p_name = [];
+				p_even = [];
+				p_odd = [];
+				p_info = [p_name,p_even,p_odd]
+
+				for (var j = 1; j < 8; j++) {
+					for (var i = 0; i < 3; i++) {
+						//console.log(document.getElementsByClassName(p_info_kind[i])[j].value);
+						var paused = document.getElementById('topPage').getElementsByClassName(p_info_kind[i])[j].value;
+
+						if (paused == '') {
+							if (i == 0) {paused = "guest" + j;}
+							else {paused = 0;}
+						}
+
+						p_info[i].push(paused);
+					}
+				}					
+
+				console.log(p_info);
+				gameStart(system);
+			});
+		}
+
+		document.addEventListener('DOMContentLoaded',()=>{
+			topPage();
+		});
+	</script>
+</head>
+<body>
+	<div id="results" style="left: -8px;">
+		<div class="line" style="user-select: none;">
+			<div class="name">name</div>
+			<div class="even">even</div>
+			<div class="odd">odd</div>
+			<div class="result">result</div>
+		</div>
+
+		<div class="line" style="user-select: none;"><!--1-->
+			<div class="name"></div>
+			<div class="even"></div>
+			<div class="odd"></div>
+			<div class="result"></div>
+		</div>
+
+		<div class="line" style="user-select: none;"><!--2-->
+			<div class="name"></div>
+			<div class="even"></div>
+			<div class="odd"></div>
+			<div class="result"></div>
+		</div>
+
+		<div class="line" style="user-select: none;"><!--3-->
+			<div class="name"></div>
+			<div class="even"></div>
+			<div class="odd"></div>
+			<div class="result"></div>
+		</div>
+
+		<div class="line" style="user-select: none;"><!--4-->
+			<div class="name"></div>
+			<div class="even"></div>
+			<div class="odd"></div>
+			<div class="result"></div>
+		</div>
+
+		<div class="line" style="user-select: none;"><!--5-->
+			<div class="name"></div>
+			<div class="even"></div>
+			<div class="odd"></div>
+			<div class="result"></div>
+		</div>
+
+		<div class="line" style="user-select: none;"><!--6-->
+			<div class="name"></div>
+			<div class="even"></div>
+			<div class="odd"></div>
+			<div class="result"></div>
+		</div>
+
+		<div class="line" style="user-select: none;"><!--7-->
+			<div class="name"></div>
+			<div class="even"></div>
+			<div class="odd"></div>
+			<div class="result"></div>
+		</div>
+
+		<div id="restart">再挑戦</div>
+	</div>
+
+	<div id="topPage">
+		<div id="title">
+			<span class="top_button"></span>
+			<span class="bottom_button"></span>
+			<span class="left_button"></span>
+			<span class="right_button"></span>
+			<div id="ableToEven" class="able" style="left: 0;"></div>
+			<div id="ableToOdd" class="able" style="right: 0;"></div>
+			<div>丁</div>
+			<div>半</div>
+		</div>
+
+		<div id="sub">~disital remaster~</div>
+
+		<div id="obTop" class="Z">
+			<div class="X cube_sub"></div>
+			<div class="Y cube_sub"></div>
+			<div class="top parts"><div class="circle" style="width: 20px; height: 20px; background: red; left: 15px; top: 15px;"></div></div>
+			<div class="bottom parts">
+				<div class="circle" style="top: 4px; left: 10px;"></div><div class="circle" style="top: 18px; left: 10px;"></div><div class="circle" style="top: 32px; left: 10px;"></div>
+				<div class="circle" style="top: 4px; right: 10px;"></div><div class="circle" style="top: 18px; right: 10px;"></div><div class="circle" style="top: 32px; right: 10px;"></div>
+			</div>
+
+			<div class="right parts">
+				<div class="circle" style="top: 4px; right: 10px;"></div><div class="circle" style="top: 32px; left: 10px;"></div>
+			</div>
+
+			<div class="left parts">
+				<div class="circle" style="top: 5px; left: 5px;"></div><div class="circle" style="bottom: 5px; left: 5px;"></div>
+				<div class="circle" style="left: 20px; top: 20px;"></div>
+				<div class="circle" style="top: 5px; right: 5px;"></div><div class="circle" style="bottom: 5px; right: 5px;"></div>
+			</div>
+
+			<div class="front parts">
+				<div class="circle" style="top: 5px; left: 5px;"></div>
+				<div class="circle" style="left: 20px; top: 20px;"></div>
+				<div class="circle" style="bottom: 5px; right: 5px;"></div>		
+			</div>
+
+			<div class="back parts">
+				<div class="circle" style="top: 5px; left: 5px;"></div><div class="circle" style="bottom: 5px; left: 5px;"></div>
+				<div class="circle" style="top: 5px; right: 5px;"></div><div class="circle" style="bottom: 5px; right: 5px;"></div>
+			</div>
+		</div>
+
+		<div id="backdrop">
+			<div class="line" style="user-select: none;">
+				<div class="name" style="user-select: none;">name</div>
+				<div class="even" style="user-select: none;">even</div>
+				<div class="odd" style="user-select: none;">odd</div>
+			</div>
+
+			<div class="line">
+				<input type="text" class="name" value="A">
+				<input type="text" class="even">
+				<input type="text" class="odd">
+			</div>
+
+			<div class="line">
+				<input type="text" class="name" value="B">
+				<input type="text" class="even">
+				<input type="text" class="odd">
+			</div>
+
+			<div class="line">
+				<input type="text" class="name" value="C">
+				<input type="text" class="even">
+				<input type="text" class="odd">
+			</div>
+
+			<div class="line">
+				<input type="text" class="name" value="D">
+				<input type="text" class="even">
+				<input type="text" class="odd">
+			</div>
+
+			<div class="line">
+				<input type="text" class="name" value="E">
+				<input type="text" class="even">
+				<input type="text" class="odd">
+			</div>
+
+			<div class="line">
+				<input type="text" class="name" value="F">
+				<input type="text" class="even">
+				<input type="text" class="odd">
+			</div>
+
+			<div class="line">
+				<input type="text" class="name" value="G">
+				<input type="text" class="even">
+				<input type="text" class="odd">
+			</div>		
+		</div>
+	</div>
+
+	<div id="mainGame">
+		<div id="rl" class="light" style="left: -25px;"></div>
+		<div id="ll" class="light" style="right: -25px;"></div>
+
+		<div id="ob1" class="Z">
+			<!--<div class="X cube_sub"></div>
+			<div class="Y cube_sub"></div>-->
+			<div class="top parts"><div class="circle" style="width: 20px; height: 20px; background: red; left: 15px; top: 15px;"></div></div>
+			<div class="bottom parts">
+				<div class="circle" style="top: 4px; left: 10px;"></div><div class="circle" style="top: 18px; left: 10px;"></div><div class="circle" style="top: 32px; left: 10px;"></div>
+				<div class="circle" style="top: 4px; right: 10px;"></div><div class="circle" style="top: 18px; right: 10px;"></div><div class="circle" style="top: 32px; right: 10px;"></div>
+			</div>
+
+			<div class="right parts">
+				<div class="circle" style="top: 4px; right: 10px;"></div><div class="circle" style="top: 32px; left: 10px;"></div>
+			</div>
+
+			<div class="left parts">
+				<div class="circle" style="top: 5px; left: 5px;"></div><div class="circle" style="bottom: 5px; left: 5px;"></div>
+				<div class="circle" style="left: 20px; top: 20px;"></div>
+				<div class="circle" style="top: 5px; right: 5px;"></div><div class="circle" style="bottom: 5px; right: 5px;"></div>
+			</div>
+
+			<div class="front parts">
+				<div class="circle" style="top: 5px; left: 5px;"></div>
+				<div class="circle" style="left: 20px; top: 20px;"></div>
+				<div class="circle" style="bottom: 5px; right: 5px;"></div>		
+			</div>
+
+			<div class="back parts">
+				<div class="circle" style="top: 5px; left: 5px;"></div><div class="circle" style="bottom: 5px; left: 5px;"></div>
+				<div class="circle" style="top: 5px; right: 5px;"></div><div class="circle" style="bottom: 5px; right: 5px;"></div>
+			</div>
+		</div>
+
+		<div id="ob2" class="Z">
+			<!--<div class="X cube_sub"></div>
+			<div class="Y cube_sub"></div>-->
+			<div class="top parts"><div class="circle" style="width: 20px; height: 20px; background: red; left: 15px; top: 15px;"></div></div>
+			<div class="bottom parts">
+				<div class="circle" style="top: 4px; left: 10px;"></div><div class="circle" style="top: 18px; left: 10px;"></div><div class="circle" style="top: 32px; left: 10px;"></div>
+				<div class="circle" style="top: 4px; right: 10px;"></div><div class="circle" style="top: 18px; right: 10px;"></div><div class="circle" style="top: 32px; right: 10px;"></div>
+			</div>
+
+			<div class="right parts">
+				<div class="circle" style="top: 4px; right: 10px;"></div><div class="circle" style="top: 32px; left: 10px;"></div>
+			</div>
+
+			<div class="left parts">
+				<div class="circle" style="top: 5px; left: 5px;"></div><div class="circle" style="bottom: 5px; left: 5px;"></div>
+				<div class="circle" style="left: 20px; top: 20px;"></div>
+				<div class="circle" style="top: 5px; right: 5px;"></div><div class="circle" style="bottom: 5px; right: 5px;"></div>
+			</div>
+
+			<div class="front parts">
+				<div class="circle" style="top: 5px; left: 5px;"></div>
+				<div class="circle" style="left: 20px; top: 20px;"></div>
+				<div class="circle" style="bottom: 5px; right: 5px;"></div>		
+			</div>
+
+			<div class="back parts">
+				<div class="circle" style="top: 5px; left: 5px;"></div><div class="circle" style="bottom: 5px; left: 5px;"></div>
+				<div class="circle" style="top: 5px; right: 5px;"></div><div class="circle" style="bottom: 5px; right: 5px;"></div>
+			</div>
+		</div>
+
+		<div id="role_show" style="display: none;"></div>
+		<div id="command_click" style="display: none;">click to continue</div>
+	</div>
+
+	<!--<div id="field"></div>-->
+</body>
+</html>

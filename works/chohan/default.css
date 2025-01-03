@@ -1,0 +1,186 @@
+body {
+	background: #111;
+	width: 100vw;
+	height: 100vh;
+	overflow: hidden;
+
+	user-select: none;
+
+	transform-style: preserve-3d;
+	perspective: 10000px;
+}
+
+#mainGame {
+	opacity: 0;
+	transform-style: preserve-3d;
+	perspective: 10000px;
+	width: 100vw;
+	height: 100vh;
+
+	position: fixed;
+	top: 0;
+	left: -8px;
+
+	z-index: -100;
+}
+
+/*明り*/
+.light {
+	width: 50px;
+	height: 100vh;
+	background-color: #0ff;
+	position: absolute;
+	top: 0px;
+	box-shadow: 0 0 5px #0ff, 0 0 25px #0ff,  0 0 50px #0ff,  0 0 100px #0ff;
+	border-radius: 25px;
+
+	z-index: -100000000;
+	opacity: 0.5;
+}
+
+/*本体*/
+.Z {
+	width: 50px;
+	height: 50px;
+	position: absolute;
+	left: calc(50vw - 25px);
+	top: 50px;
+	transform-style: preserve-3d;
+	perspective: 10000px;
+	user-select: none;
+
+	/*opacity: 0;*/
+
+	/*transform: rotateX(-20deg) rotateY(30deg);*/
+}
+
+.cube_sub {
+	width: 50px;
+	height: 50px;
+	position: absolute;
+}
+
+.X {
+	transform: rotateX(90deg);
+}
+
+.Y {
+	transform: rotateY(90deg);
+}
+
+.left {
+	transform: rotateY(-90deg) translateZ(25px);
+}
+
+.right {
+	transform: rotateY(90deg) translateZ(25px);
+}
+
+.back {
+	transform: rotateY(180deg) translateZ(25px);
+}
+
+.front {
+	transform: rotateY(0deg) translateZ(25px);
+}
+
+.top {
+	transform: rotateX(90deg) translateZ(25px);
+	color: red;
+}
+
+.bottom {
+	transform: rotateX(-90deg) translateZ(25px);
+}
+
+.parts {
+	width: 50px;
+	height: 50px;
+	border: solid 1px #000;
+	position: absolute;
+	background: #f8f4e6;
+	font-size: 30px;
+	line-height: 50px;
+	text-align: center;
+	opacity: 1;
+}
+
+@font-face {
+	font-family: 'custom1';
+	src: url('KouzanBrushFontSousyo.ttf');
+}
+
+@font-face {
+	font-family: "custom2";
+	src: url("HOT-Soshokk-R.otf");
+}
+
+#role_show {
+	width: 420px;
+	height: 70px;
+	font-size: 70px;
+	line-height: 70px;
+	color: #fff;
+	opacity: 0;
+	text-align: center;
+	font-family: "custom2";
+
+	position: absolute;
+	top: calc(50vh - 35px);
+	left: calc(50vw - 210px);
+}
+
+#command_click {
+	width: 100vw;
+	height: 50px;
+	font-size: 30px;
+	text-align: center;
+	line-height: 50px;
+	color: #fff;
+	background: none;
+
+	position: absolute;
+	bottom: 100px;
+
+	animation-name: flashment;
+	animation-duration: 2s;
+	animation-timing-function: linear;
+	animation-iteration-count: infinite;
+}
+
+@keyframes flashment {
+	0% {
+		opacity: 1;
+	}
+
+	50% {
+		opacity: 0;
+	}
+
+	100% {
+		opacity: 1;
+	}
+}
+
+.circle {
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: black;
+
+	position: absolute;
+}
+
+.star {
+	width: 15px;
+	height: 15px;
+	border-radius: 0;
+	clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+.parts {
+	box-shadow: 0 0 1px #f8f4e6,
+              0 0 2px #f8f4e6,
+              0 0 5px #f8f4e6,
+              0 0 8px #f8f4e6;
+}

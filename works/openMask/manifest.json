@@ -1,0 +1,10 @@
+{
+    "manifest_version": 3,
+    "name": "open mask",
+    "version": "1.0",
+    "description": "test",
+    "content_scripts": [{
+        "matches": ["https://takeshiwada1980.github.io/*"],
+        "js": ["content.js"]
+    }]
+}

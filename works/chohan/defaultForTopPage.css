@@ -1,0 +1,340 @@
+@font-face {
+	font-family: "custom1";
+	src: url("HOT-Soshokk-R.otf");
+}
+
+@font-face {
+	font-family: "custom2";
+	src: url("Juliette-Regular.otf");
+}
+
+@font-face {
+	font-family: "custom3";
+	src: url("KouzanBrushFontSousyo.ttf");
+}
+
+#topPage {
+	opacity: 0;
+	width: 100vw;
+	height: 100vh;
+	background-color: #222;
+	overflow: hidden;
+
+	z-index: 100;
+}
+
+#title {
+	width: 200px;
+	position: absolute;
+	left: calc(50vw - 100px);
+	top: 100px;
+	overflow: hidden;
+	color: #fff;
+}
+
+#title:hover {
+	background-color: #fff;
+	color: #222;
+	box-shadow: 0 0 5px #fff,
+              0 0 25px #fff,
+              0 0 50px #fff,
+              0 0 100px #fff;
+    transform: scale(1.1);
+}
+
+#title:active {
+	transform: scale(1);
+}
+
+#title div:not(.able) {
+	width: 100px;
+	height: 100px;
+	font-size: 100px;
+	text-align: center;
+	line-height: 100px;
+	float: left;
+
+	font-family: "custom1";
+	user-select: none;
+}
+
+#title span {
+	position: absolute;
+	border-radius: 1px;
+}
+
+.top_button {
+	width: 100%;
+	height: 5px;
+	top: 0px;
+	left: 0px;
+	background: linear-gradient(90deg,#222,#fff);
+
+	animation-name: slide_top;
+	animation-duration: 2s;
+	animation-delay: 0s;
+	animation-iteration-count: infinite;
+	animation-timing-function: linear;
+	animation-iteration-count: infinite;
+	animation-fill-mode: backwards;
+}
+
+.bottom_button {
+	width: 100%;
+	height: 5px;
+	bottom: 0px;
+	right: 0px;
+	background: linear-gradient(-90deg,#222,#fff);
+
+	animation-name: slide_bottom;
+	animation-duration: 2s;
+	animation-delay: 1s;
+	animation-iteration-count: infinite;
+	animation-timing-function: linear;
+	animation-iteration-count: infinite;
+	animation-fill-mode: backwards;
+}
+
+.left_button {
+	height: 100%;
+	width: 5px;
+	top: 0px;
+	left: 0px;
+	background: linear-gradient(0deg,#222,#fff);
+
+	animation-name: slide_left;
+	animation-duration: 2s;
+	animation-delay: 1.5s;
+	animation-iteration-count: infinite;
+	animation-timing-function: linear;
+	animation-iteration-count: infinite;
+	animation-fill-mode: backwards;
+}
+
+.right_button {
+	height: 100%;
+	width: 5px;
+	bottom: 0px;
+	right: 0px;
+	background: linear-gradient(180deg,#222,#fff);
+
+	animation-name: slide_right;
+	animation-duration: 2s;
+	animation-delay: 0.5s;
+	animation-iteration-count: infinite;
+	animation-timing-function: linear;
+	animation-iteration-count: infinite;
+	animation-fill-mode: backwards;
+}
+
+@keyframes slide_top {
+	0%  {
+		transform: translateX(-100%);
+	}
+
+	50% {
+		transform: translateX(100%);
+	}
+
+	100% {
+		transform: translateX(100%);
+	}
+}
+
+@keyframes slide_right {
+	0%  {
+		transform: translateY(-100%);
+	}
+
+	50% {
+		transform: translateY(100%);
+	}
+
+	100% {
+		transform: translateY(100%);
+	}
+}
+
+@keyframes slide_bottom {
+	0%  {
+		transform: translateX(100%);
+	}
+
+	50% {
+		transform: translateX(-100%);
+	}
+
+	100% {
+		transform: translateX(-100%);
+	}
+}
+
+@keyframes slide_left {
+	0%  {
+		transform: translateY(100%);
+	}
+
+	50% {
+		transform: translateY(-100%);
+	}
+
+	100% {
+		transform: translateY(-100%);
+	}
+}
+
+
+#sub {
+	width: 100vw;
+	height: 50px;
+	position: absolute;
+	top: 200px;
+	text-align: center;
+	line-height: 50px;
+	font-size: 40px;
+	color: #fff;
+	font-family: "custom2";
+	user-select: none;
+}
+
+#obTop {
+	transform: translateY(400px) translateX(400px) rotateX(-20deg) rotateY(30deg) scale3d(5,5,5);
+}
+
+#backdrop {
+	width: 70vw;
+	height: 400px;
+	position: absolute;
+	left: 15vw;
+	bottom: 0px;
+	backdrop-filter: blur(5px);
+	border: solid 1px #fff;
+}
+
+.line:nth-child(odd) {
+	background: #fff;
+	color: #000;
+}
+
+.line:nth-child(even) {
+	background: #222;
+	color: #fff;
+}
+
+.line:nth-child(odd) * {
+	border: solid 1px #222;
+}
+
+.line:nth-child(even) * {
+	border: solid 1px #fff;
+}
+
+.line {
+	width: 100%;
+	height: 50px;
+	opacity: 0.5;
+
+}
+
+.line * {
+	float: left;
+	height: 50px;
+	text-align: center;
+	box-sizing: border-box;
+	padding: 0;
+	margin: 0;
+	font-size: 40px;
+	line-height: 50px;
+	font-family: serif;	
+
+	background: none;
+	color: inherit;
+}
+
+.line * {
+	user-select: all;
+}
+
+.name {
+	width: 20vw;
+}
+
+.even {
+	width: 25vw;
+}
+
+.odd {
+	width: 25vw;
+}
+
+.result {
+	width: 30vw;
+}
+
+#results {
+	position: absolute; 
+	opacity: 0; 
+	width: 100vw; 
+	left: -8px;
+	top: calc(50vh - 200px); 
+	z-index: -100; 
+	backdrop-filter: blur(5px);
+	user-select: none !important;
+}
+
+#results div {
+	user-select: none !important;
+}
+
+.able {
+	width: 25px;
+	height: 100px;
+	position: absolute;
+	top: 0px;
+}
+
+#restart {
+	width: 200px;
+	height: 50px;
+	font-size: 40px;
+	line-height: 50px;
+	font-family: 'custom3';
+	position: absolute;
+	bottom: -100px;
+	left: calc(50vw - 100px);
+	color: #fff;
+	text-align: center;
+}
+
+#field {
+	width: 100vw;
+	height: 100vh;
+	position: absolute;
+	left: 0;
+	top: 0;
+	z-index: -1;
+}
+
+.paper0 {
+	width: 20px;
+	height: 20px;
+	background: #fff;
+	position: absolute;
+	top: 0;
+	z-index: 200;
+
+	animation-name: paper;
+	animation-duration: 2s;
+	animation-iteration-count: infinite;
+	animation-timing-function: linear;
+}
+
+@keyframes paper {
+	0% {
+		transform: translateX(0px) translateY(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg); 
+	}
+
+	100% {
+		transform: translateX(0px) translateY(110vh) rotateX(1000deg) rotateY(1000deg) rotateZ(1000deg);
+	}
+}
