@@ -5,6 +5,7 @@ import math
 from itertools import groupby
 import time
 import keyboard
+import asyncio
 
 continuous = lambda x,y: list(range(x,x+y)) #:: Int -> Int -> [Int]
 intersect = lambda x,y: list(set(x) & set(y)) #:: [Int] -> [Int] -> [Int]
@@ -35,19 +36,20 @@ class Creature:
     def display(self):
         print(f"{self.name} | hp:{self.hp[0]}/{self.hp[1]} | str:{self.str[0]}/{self.str[1]} | arm:{self.arm[0]}/{self.arm[1]} | int:{self.int} | spd:{self.spd[0]}/{self.spd[1]} | len:{self.len} | cnd:{[c.name for c in self.cnd]}")
 
-    def action(self):
-        if self.hp <= 0:
-            return
+    def action(self, floor):
+        pass
+        # if self.hp <= 0:
+        #     return
         
-        for c in self.cnd:
-            c.applicate()
+        # for c in self.cnd:
+        #     c.applicate()
 
-        self.display()
-        e = keyboard.read_event()
-        while(e.event_type == keyboard.KEY_UP):
-            e = keyboard.read_event()
+        # self.display()
+        # e = keyboard.read_event()
+        # while(e.event_type == keyboard.KEY_UP):
+        #     e = keyboard.read_event()
 
-        print(e.name)
+        # print(e.name)
 
     def move(self, dx, dy):
         self.pos[0] += dx
@@ -64,9 +66,40 @@ class Creature:
 
 class Player(Creature):
     def __init__(self, name):
-        super().__init__(name)
+        super().__init__("@"+name)
         self.san = 100
+        self.point = 0
         self.storage = []
+
+    def display(self):
+        print(f"{self.name[1:]} | hp:{self.hp[0]}/{self.hp[1]} | str:{self.str[0]}/{self.str[1]} | arm:{self.arm[0]}/{self.arm[1]} | int:{self.int} | spd:{self.spd[0]}/{self.spd[1]} | len:{self.len} | cnd:{[c.name for c in self.cnd]} | san:{self.san}")  
+
+    async def action(self, floor):
+        # loop = asyncio.get_event_loop()
+        # print("Enter something: ")
+        # # 非同期でブロッキングなinput()を実行
+        # user_input = await loop.run_in_executor(None, input)
+        # print(f"You entered: {user_input}")
+
+        e = keyboard.read_event()
+        while(e.event_type == keyboard.KEY_UP):
+            e = keyboard.read_event()
+
+        past = copy.deepcopy(self.pos)
+        key = e.name
+        match(key):
+            case "left": self.pos[0]-=1
+            case "right": self.pos[0]+=1
+            case "up": self.pos[1]-=1
+            case "down": self.pos[1]+=1
+
+        char = floor.field[self.pos[1]][self.pos[0]]
+        if(not char in [".", "+", "#", "%"]):
+            print("hit")
+            self.pos = past
+            # self.action(floor)
+
+        return key
 
 class Enemy(Creature):
     def __init__(self, name, lvl, len = 1):
@@ -167,12 +200,12 @@ class Room:
         return False
 
 class Floor:
-    def __init__(self,size = (100,50),numRooms = 8):
+    def __init__(self, player, size = (100,50),numRooms = 8):
         #self.field = "" #:: String
         self.size = size #:: (Int, Int)
         self.rooms = [] #:: [Room]
         self.field = [[" " for x in range(self.size[0])] for y in range(self.size[1])] #:: [[Char]]
-        self.road = [] #::[(Int, Int)]
+        self.road = [] #::[(Int, Int)] 
         self.char = [] #::[Creature]
 
         self.sector = [[0,0]+list(size)] #:: [[Int, Int, Int, Int]] //ix iy sx sy
@@ -209,6 +242,9 @@ class Floor:
 
         self.ent = [random.choice(sr.range(0)[1:-1]),random.choice(sr.range(1)[1:-1])] #::[Int]
         self.ext = [random.choice(er.range(0)[1:-1]),random.choice(er.range(1)[1:-1])] #::[Int]
+
+        player.pos = self.ent
+        self.char.append(player)
 
         roads = sr.road(self.rooms,er) #:: [Room]
         #print(road)
@@ -284,8 +320,12 @@ class Floor:
             for e in r[1:-1]:
                 self.field[e[1]][e[0]] = "#"
 
-        for d in [self.ent, self.ext]:
+        for d in [self.ext]:
             self.field[d[1]][d[0]] = "%"
+
+        for c in self.char:
+            pos = c.pos
+            self.field[pos[1]][pos[0]] = c.name[0]
 
         for y in range(self.size[1]):
             for x in range(self.size[0]):
@@ -295,15 +335,25 @@ class Floor:
 class System:
     def __init__(self, player, flrNum):
         self.field = [] #::[String]
-        self.floor = Floor() #::Floor
+        self.floor = Floor(player) #::Floor
         self.order = [] #::[Creature]
         self.player = player #::Player
+        self.floor.display()
+        self.player.display()
 
-        while (tuple(self.player.pos) == tuple(self.ext)) :
-            for c in self.order:
-                c.action()
+        asyncio.run(self.main_loop())
+
+    async def main_loop(self):
+        # while (not tuple(self.player.pos) == tuple(self.floor.ext)) :
+        #     for c in self.order:
+        #         res =  await c.action()
+        #         #await asyncio.sleep(0.5)
+
+        while (not tuple(self.player.pos) == tuple(self.floor.ext)) :
+            res = await self.player.action(self.floor)
 
             self.floor.display()
+            print(res)
                 
 
 
@@ -317,7 +367,7 @@ class Main:
         self.player = Player(name)
         self.floor = 1
 
-        while self.player.hp > 0:
+        while self.player.hp[0] > 0:
             System(self.player, self.floor)
             
             
