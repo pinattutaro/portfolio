@@ -14,6 +14,24 @@
 				src: url('dl_font/ryakjisknameMdot10.ttf');
 			}
 
+			@keyframes changeBack {
+				0% {
+					background: url("img/helix1.png");
+				}
+				25% {
+					background: url('img/helix2.png');
+				}
+				50% {
+					background: url('img/helix3.png');
+				}
+				75% {
+					background: url('img/helix4.png');
+				}
+				100% {
+					background: url('img/helix1.png')
+				}
+			}
+
 			body {
 				width: 100vw;
 				overflow-x: hidden;
@@ -225,9 +243,16 @@
 							aspect-ratio: 1;
 							border: solid 1px #ccc;
 							box-sizing: border-box;
-							background-size: 100%;
+							background-size: 100% !important;
 							background-repeat: no-repeat;
 							background-position: 50%;
+
+							&#helix {
+								animation-name: changeBack;
+								animation-duration: 20s;
+								animation-timing-function: linear;
+								animation-iteration-count: infinite;
+							}
 						}
 
 						& > .description {
@@ -414,6 +439,16 @@
 								<div class="subTitle">openMask</div>
 								　プログラミングの資料の隠れてる部分を一々押して表示するの面倒くさいからスクロールするだけで表示状態にしてくれるようにしました。怒られるかな？
 								<div class="tags">#javascript</div>
+							</div>
+						</span>
+
+						<span>
+							<a id="helix" class="thumb" href="https://github.com/pinattutaro/portfolio/tree/main/works/helix" style=""></a>
+							<div class="description" style="overflow-y: scroll;">
+								<div class="subTitle">helix</div>
+								　pythonでゲームを作ろうという発想の元始まった。意地でもpyGameを使いたくないという無駄な固執からpyGame不使用での製作が決まった。もとより、cmd上で表示するゲームを製作しようと画策してはいたものの、なかなか手がつかず、今回やっと重い腰を持ち上げたところだ。<br>
+								　このゲームはいたってシンプル。なぞのダンジョンに迷い込んだ主人公が唯下を目指して探索する。道中で敵を倒したり、お金を集めながら何階まで降りられるかというちょっぴり鬼畜なゲームを製作。したかったのだが、先述した通り、cmd上での出力に手間取り未だステージ生成のアルゴリズムしか完成していない。せめてここまで頑張った点を紹介させてほしい。先ず、部屋同士が重ならずに効率的にランダムな場所と大きさに生成する為に、ステージ全体をセクターで再帰的に区切って、その中に部屋を作るというアルゴリズムを考案した。次に部屋同士を繋ぐ通路の作成。これはなかなか苦労した。各部屋の接続可能な部屋を総て洗い、その組み合わせを総て指向するという、言ってしまえば単純なのだが、このゲームのタイトルであるhelix即ち螺旋を実現するためにスタート地点とゴール地点をある程度固定したため、今現在でもごくまれに部屋同士を繋ぐ通路を作れないことがあるが、このバグは後々有効活用するつもりである。最後に、たったこれだけの内容で冬休み前からぼちぼち製作し始め、優に二十時間以上を費やしてしまったことを伝えておこう。それもこれも総てpythonとかいう言語の配列操作の難しさにあると思う。なんでmapがオブジェクトを返すんだろう。教えはどうなってんだ、教えは。<br>
+								　追記、自キャラの移動のみ実装しました。01/20					
 							</div>
 						</span>
 					</div>
