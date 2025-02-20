@@ -89,7 +89,7 @@ class Bridge(QObject):
 
     @Slot(str)
     def receive_text(self, text):
-        print(f"Pythonで受信: {text}")
+        #print(f"Pythonで受信: {text}")
         self.text_received.emit(text)
 
 
