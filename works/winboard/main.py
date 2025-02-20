@@ -8,6 +8,8 @@ import threading
 import numpy as np
 import sounddevice as sd
 import json
+import os
+from PySide6.QtCore import QUrl
 
 
 current_thread = None
@@ -17,18 +19,42 @@ with open("piano.html", encoding="utf8") as f:
     html = f.read()
 
 notes = {
-    "C": 261,
-    "C#": 277,
-    "D": 293,
-    "D#": 311,
-    "E": 329,
-    "F": 349,
-    "F#": 370, 
-    "G": 392,
-    "G#": 415,
-    "A": 440,
-    "A#": 466,
-    "B": 493
+    "C3": 130,
+    "C#3": 138,
+    "D3": 146,
+    "D#3": 155,
+    "E3": 164,
+    "F3": 174,
+    "F#3": 185,
+    "G3": 196,
+    "G#3": 207,
+    "A3": 220,
+    "A#3": 233,
+    "B3": 246,
+    "C4": 261,
+    "C#4": 277,
+    "D4": 293, 
+    "D#4": 311,
+    "E4": 329,
+    "F4": 349,
+    "F#4": 370,
+    "G4": 392,
+    "G#4": 415,
+    "A4": 440,
+    "A#4": 466,
+    "B4": 493,
+    "C5": 523,
+    "C#5": 554,
+    "D5": 587,
+    "D#5": 622,
+    "E5": 659,
+    "F5": 698,
+    "F#5": 740,
+    "G5": 784,
+    "G#5": 831,
+    "A5": 880,
+    "A#5": 932,
+    "B5": 987,
 }
 
 sample_rate = 44100
@@ -72,7 +98,7 @@ app = QApplication(sys.argv)
 # メインウィンドウの設定
 window = QWidget()
 window.resize(800, 400)
-window.setWindowTitle("pythonﾊｽｺﾞｲﾖｰ")
+window.setWindowTitle("winBoard")
 layout = QVBoxLayout()
 
 # WebEngineView の作成
@@ -85,11 +111,12 @@ channel.registerObject("bridge", bridge)
 web_view.page().setWebChannel(channel)
 
 # HTML コンテンツ
-
 html_content = html
 
 # HTML を WebEngineView にセット
-web_view.setHtml(html_content)
+current_dir = os.path.dirname(os.path.abspath(__file__))
+base_url = QUrl.fromLocalFile(current_dir + "/")
+web_view.setHtml(html_content, base_url)
 
 # レイアウトに WebView を追加
 layout.addWidget(web_view)
