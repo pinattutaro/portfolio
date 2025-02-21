@@ -2,7 +2,7 @@
 
 ## 実行方法
 
-pip install -r requirements.txt
+pip install -r requirements.txt<br>
 python main.py
 
 ## 使い方
