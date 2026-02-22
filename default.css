@@ -187,9 +187,12 @@ body {
     }
 
     & > #header {
-        position: sticky;
+        position: fixed;
+        width: 100%;
         top: 0;
+        left: 0;
         z-index: 10;
+        background-color: var(--base0);
     }
 
     & > #header, & > #footer {
@@ -218,6 +221,11 @@ body {
             color: var(--b1);
             background-color: var(--red);
             border-radius: 0.2em;
+        }
+
+        & > a {
+            padding: 0;
+            margin: 0;
         }
 
         & > .nav {
