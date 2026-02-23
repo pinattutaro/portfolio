@@ -535,6 +535,11 @@ body {
                 &:nth-of-type(even) {
                     color: var(--red);
                 }
+
+                & > img {
+                    width: 1em;
+                    margin: 0;
+                }
             }
         }
     }
