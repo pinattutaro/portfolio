@@ -187,7 +187,7 @@ body {
     }
 
     & > #header {
-        position: fixed;
+        position: sticky;
         width: 100%;
         top: 0;
         left: 0;
@@ -322,6 +322,7 @@ body {
             overflow-y: hidden;
             padding: 0;
             box-sizing: border-box;
+            scrollbar-width: none; /* Firefox */
 
             &::-webkit-scrollbar {
                 display: none;
@@ -400,6 +401,7 @@ body {
                 padding: 0;
                 overflow: clip;
                 border-radius: 1em 1em 0 0;
+                text-transform: none;
 
                 & > .thumb {
                     width: 100%;
